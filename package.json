@@ -1,0 +1,25 @@
+{
+  "name": "application-name",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "start": "node app"
+  },
+  "devDependencies" : {
+	"mocha" : "*",	
+	"superagent" : "*",	
+	"should" : "*"
+  },
+  "dependencies": {
+    "express": "3.0.3",
+    "jade": "*",
+    "less-middleware": "*"
+  },
+  "publicConfig": {
+    "http_port": 3000,
+    "request_timeout": 10000,
+    "session_secret": "MySuperSecretKey",
+    "log_requests": false,    
+    "test": false
+  }
+}
