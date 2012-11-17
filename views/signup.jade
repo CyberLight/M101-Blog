@@ -1,4 +1,19 @@
 extends layout
 
 block content
-  h1= title
+  form(method="post")
+    div.signupform
+        h1= title
+        label 
+          | User name:
+          input(type="text", name="username")
+        label
+          | Password:
+          input(type="password", name="password")
+        label
+          | Verify password:
+          input(type="password", name="verify")
+        label
+          | E-mail (optional):
+          input(type="email", name="email")
+        input(type="submit")

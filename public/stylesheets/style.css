@@ -5,3 +5,17 @@ body {
 a {
   color: #00B7FF;
 }
+.signupform {
+  width: 200px;
+  margin-left: auto;
+  margin-right: auto;
+}
+.signupform label {
+  display: block;
+  font-weight: bold;
+  margin-top: 10px;
+}
+.signupform input[type="submit"] {
+  font-weight: bold;
+  margin-top: 10px;
+}

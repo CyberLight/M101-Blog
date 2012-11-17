@@ -1,3 +1,5 @@
+@signup-margin-top: 10px;
+
 body {
   padding: 50px;
   font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
@@ -5,4 +7,21 @@ body {
 
 a {
   color: #00B7FF;
+}
+
+.signupform {
+    width : 200px;
+    margin-left: auto;
+    margin-right: auto;
+    
+    label {
+        display: block;
+        font-weight: bold;
+        margin-top: @signup-margin-top;
+    }
+    
+    input[type="submit"]{
+        font-weight: bold;
+        margin-top: @signup-margin-top;
+    }
 }
