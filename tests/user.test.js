@@ -5,50 +5,211 @@ var mocha = require('../node_modules/mocha'),
 	testUtils = require("../lib/shared/test.utils"),
 	cheerio = require('cheerio'),
 	agent = superagent.agent(),
-	httpRootPath = 'http://localhost:3000';
-
+	httpRootPath = 'http://localhost:3000',
+    USER_NAME = "cyberlight",
+    USER_PASSWORD = "t3stP@$$w0Rd",
+    E_MAIL = "",
+    EMPTY_DATA_VALUE="";
+    
 testUtils.startApp(3000);
+
+function logError(err){
+    if(err)
+        console.log(err);
+}
+
+function postData(username, password, verify, email, cb){
+    agent.post(httpRootPath+'/signup')
+                     .type('form')
+                     .send({username : username})
+                     .send({password : password})
+                     .send({verify : verify})
+                     .send({email : email})
+                     .end(cb);
+}
 
 describe('User signup page',function(){
 	describe('GET /signup', function(){
 		it('should be return 200 http status', function(done){
 			agent.get(httpRootPath+'/signup').end(function(err, res){
-				if(err)
-					console.log(err);
+				logError(err);
+                
 				res.status.should.equal(200);
 				done();
 			});
 		});
 		
-		it('should be contain text "Sign up page"', function(done){
+		it('should be contain text "Sign up"', function(done){
 			agent.get(httpRootPath+'/signup').end(function(err, res){
-				if(err)
-					console.log(err);
+				logError(err);
+                
 				var $ = cheerio.load(res.text);
-				$('h1').text().should.equal("Sign up page");				
+				$('h1').text().should.equal("Sign up");				
 				done();
 			});
 		});
 	});
     describe('POST /signup', function(){
         it('should be returned 200 http status', function(done){ 
-            agent.post(httpRootPath+'/signup').end(function(err, res){
-                if(err)
-                    console.log(err);
-                    
-                res.status.should.equal(200);                
-                done();
-            });
+            postData(
+            
+                USER_NAME, 
+                USER_PASSWORD, 
+                USER_PASSWORD, 
+                E_MAIL,
+                
+                function(err, res){
+                    logError(err);
+                        
+                    res.status.should.equal(200);                
+                    done();
+                }
+            );
         });
         
         it('and should be redirected to "' + httpRootPath + '/login"', function(done){
-            agent.post(httpRootPath+'/signup').end(function(err, res){
-                if(err)
-                    console.log(err);
+            postData(
+                
+                USER_NAME, 
+                USER_PASSWORD, 
+                USER_PASSWORD, 
+                E_MAIL,
                     
-                res.redirects.should.include(httpRootPath+'/login');
-                done();
+                function(err, res){
+                    logError(err);
+                    
+                    res.status.should.equal(200);
+                    res.redirects.should.include(httpRootPath+'/login');
+                    done();
+                }
+            );
+        });
+        
+        describe('send valid user credentials to "' + httpRootPath + '/login"', function(){        
+            it('should return http status 200', function(done){
+                postData(
+                
+                    USER_NAME, 
+                    USER_PASSWORD, 
+                    USER_PASSWORD, 
+                    E_MAIL,
+                    
+                    function(err, res){
+                        logError(err);
+                        
+                        res.status.should.equal(200);
+                        done();
+                    }
+                );
             });
+            
+            it("should redirect to /login page for valid user data with not empty e-mail 'mymail@gmail.com'", function(done){                
+                postData(
+                    USER_NAME, 
+                    USER_PASSWORD, 
+                    USER_PASSWORD, 
+                    "mymail@gmail.com",
+                    
+                    function(err, res){
+                        logError(err);
+                        
+                        res.status.should.equal(200);
+                        res.redirects.should.include(httpRootPath+'/login');                                                                                                                                         
+                        done();                            
+                    }
+                );
+            });
+        });
+        
+        describe('send not valid user credentials"' + httpRootPath + '/login"', function(){
+            it('should not redirect to login page when sended not matched passwords', function(done){
+                postData(
+                
+                    USER_NAME, 
+                    USER_PASSWORD, 
+                    'nOtMaTHeD_PassWord', 
+                    E_MAIL,
+                    
+                    function(err, res){
+                        logError(err);
+                        
+                        res.redirects.should.be.empty;
+                        done();
+                    }
+                );
+            });
+            
+            it("should show error for invalid e-mail value 'e-mail@'", function(done){
+                postData(
+                
+                    USER_NAME, 
+                    USER_PASSWORD, 
+                    USER_PASSWORD, 
+                    "e-mail@",
+                    
+                    function(err, res){
+                        logError(err);
+                        
+                        var $ = cheerio.load(res.text);
+                        $('div#email-error').text().should.be.equal("invalid email address");
+                        done();
+                    }
+                );
+            });
+            
+            it("should show error for invalid e-mail value 'm@.com'", function(done){                
+                postData(
+                    USER_NAME, 
+                    USER_PASSWORD, 
+                    USER_PASSWORD, 
+                    "m@.com",
+                    
+                    function(err, res){
+                        logError(err);
+                        
+                        var $ = cheerio.load(res.text);
+                        $('div#email-error').text().should.be.equal("invalid email address");                                                                                                                                           
+                        done();                            
+                    }
+                );
+            });            
+            
+            describe("with empty fields data for user", function(){
+                it("should not redirect to login page", function(done){
+                    postData(
+                        EMPTY_DATA_VALUE,
+                        EMPTY_DATA_VALUE,
+                        EMPTY_DATA_VALUE,
+                        EMPTY_DATA_VALUE,
+                        
+                        function(err, res){
+                            logError(err);
+                            
+                            res.redirects.should.be.empty;
+                            done();
+                        }
+                    )
+                });
+            
+                it("should show errors for each field", function(done){
+                    postData(
+                        EMPTY_DATA_VALUE,
+                        EMPTY_DATA_VALUE,
+                        EMPTY_DATA_VALUE,
+                        EMPTY_DATA_VALUE,
+                        
+                        function(err, res){
+                            logError(err);
+                            
+                            var $ = cheerio.load(res.text);
+                            $('div#username-error').text().should.be.equal('invalid username. try just letters and numbers');
+                            $('div#password-error').text().should.be.equal('invalid password');
+                            $('div#verify-error').text().should.be.equal('password must match');                            
+                            done();
+                        }
+                    )
+                });                
+            });            
         });
     });
 });

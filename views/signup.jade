@@ -7,13 +7,17 @@ block content
         label 
           | User name:
           input(type="text", name="username")
+          div#username-error= errors["username-error"]
         label
           | Password:
           input(type="password", name="password")
+          div#password-error= errors["password-error"]
         label
           | Verify password:
           input(type="password", name="verify")
+          div#verify-error= errors["verify-error"]
         label
           | E-mail (optional):
           input(type="email", name="email")
+          div#email-error= errors["email-error"]
         input(type="submit")
