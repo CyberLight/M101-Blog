@@ -5,17 +5,23 @@ var mocha = require('mocha'),
 	db = null,
     Interface = require('../lib/interfaces/interface').jspatterns.contracts.Interface;
 	Repository = require("../lib/repositories/repository").Repository,
-    IRepository = new Interface("IRepository", ['collection', 'getDb', 'setDb', 'findOne']),
+    IRepository = new Interface("IRepository", ['collection', 'getDb', 'setDb', 'findOne', 'find', 'insert', 'remove', 'update']),
     MdbUnit = require("../lib/utils/database/mdb.unit").MdbUnit,
     mDbImport = new MdbUnit.Import(),
     DB_NAME = "M101Test",
-    COL_USERS = "users";
+    COL_USERS = "users",
+    repository = null;
 
 function importUsersData(cb){
      mDbImport.setDb(DB_NAME).setCollection(COL_USERS).setDrop(true).importData("tests\\importData\\users.json", function(code){
         code.should.be.equal(0);
         cb();
     });
+}
+
+function logError(err){
+    if(err)
+        console.log(err);
 }
    
 beforeEach(function(){
@@ -24,52 +30,92 @@ beforeEach(function(){
 	db.on("close", function(error){
 		console.log("--- connection closed successfully");
 	});
+    repository = new Repository(COL_USERS);
+    repository.setDb(db);
 });
     
 describe("Repository object", function(){
-	it("should created successfullt", function(){
-		var repository = new Repository(COL_USERS);
+	it("should created successfullt", function(){		
 		should.exist(repository);		
 	})
 	
-    it("should implement IRepository interface", function(){
-        var repository = new Repository(COL_USERS);
-            
+    it("should implement IRepository interface", function(){            
         (function(){
             Interface.ensureImplements(repository, IRepository);
         }).should.not.throw();
     });
     
-	it("should return Collection name in property 'collection'", function(){
-		var repository = new Repository(COL_USERS);
+	it("should return Collection name in property 'collection'", function(){		
 		repository.collection.should.be.equal(COL_USERS);			
 	});
 	
 	it("should return db object fron 'getDb' setted using 'setDb'", function(){
-		var repository = new Repository(COL_USERS),
-			retDb = null;
-		repository.setDb(db);
+		var retDb = null;		
 		retDb = repository.getDb();
 		should.exist(retDb);
 		retDb.should.be.equal(db);
 	});
 	
-	
 	describe("CRUD operations", function(){
 		describe("select operations", function(){
 			it("should return one user by _id", function(done){
-                importUsersData(function(){
-                    var repository = new Repository(COL_USERS);
-                    repository.setDb(db);
+                importUsersData(function(){                   
                     repository.findOne({"_id": "user1"}, function(err, item){
-                        if(err)
-                            console.log(err);                        
+                        logError(err);
                         should.exist(item);
                         item._id.should.be.equal("user1");
                         done();
                     });
                 });
-			});
+			}); 
+            it("should return all users", function(done){
+                importUsersData(function(){
+                    repository.find({}, {}, function(err, users){
+                        logError(err);
+                        should.exist(users);                        
+                        users.length.should.be.equal(4);
+                        done();
+                    });
+                });
+            });
+            it("should insert new user", function(done){
+                importUsersData(function(){
+                    repository.insert({'_id' : 'user5', password : 'notencruptedpassword'},function(err, user){
+                        logError(err);
+                        should.exist(user);
+                        repository.find({},{}, function(err, users){
+                            users.length.should.be.equal(5);
+                            done();
+                        });
+                    });
+                });
+            });
+            it("should remove user by _id", function(done){
+                importUsersData(function(){
+                    repository.remove({'_id' : 'user4'}, {}, function(err, numberRemoved){
+                        logError(err);
+                        numberRemoved.should.be.equal(1);
+                        repository.find({},{}, function(err, users){
+                            users.length.should.be.equal(3);
+                            done();
+                        });
+                    });
+                });
+            });
+            it("should update password by user _id", function(done){
+                importUsersData(function(){
+                    var PASSWORD_VALUE = 'passwordChanged',
+                        USER_ID = "user4";
+                    repository.update({'_id' : USER_ID}, { '$set' : { 'password' : PASSWORD_VALUE } }, {}, function(err, numberUpdated){
+                        logError(err);                        
+                        numberUpdated.should.be.equal(1);
+                        repository.findOne({"_id": USER_ID}, function(err, item){
+                            item.password.should.be.equal(PASSWORD_VALUE);
+                            done();
+                        });
+                    });
+                });
+            });
 		});
 	});
 });
