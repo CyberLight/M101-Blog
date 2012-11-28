@@ -5,7 +5,7 @@ var mocha = require('mocha'),
 	db = null,
     Interface = require('../lib/interfaces/interface').jspatterns.contracts.Interface;
 	Repository = require("../lib/repositories/repository").Repository,
-    IRepository = new Interface("IRepository", ['collection', 'getDb', 'setDb', 'findOne', 'find', 'insert', 'remove', 'update']),
+    IRepository = new Interface("IRepository", ['collection', 'getDb', 'setDb', 'findOne', 'find', 'insert', 'remove', 'update', 'count']),
     MdbUnit = require("../lib/utils/database/mdb.unit").MdbUnit,
     mDbImport = new MdbUnit.Import(),
     DB_NAME = "M101Test",
@@ -113,6 +113,15 @@ describe("Repository object", function(){
                             item.password.should.be.equal(PASSWORD_VALUE);
                             done();
                         });
+                    });
+                });
+            });
+            it("should return count of users in collection", function(done){
+                importUsersData(function(){
+                    repository.count({}, {}, function(err, count){
+                        logError(err);
+                        count.should.be.equal(4);
+                        done();
                     });
                 });
             });
