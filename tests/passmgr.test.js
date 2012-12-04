@@ -1,7 +1,7 @@
 var PasswordManager = require('../lib/sec/passmgr').PasswordManager,
     should = require('should'),
     Interface = require('../lib/interfaces/interface').jspatterns.contracts.Interface,
-    IPasswordManager  = new Interface("IPasswordManager", ['makeSalt']),
+    IPasswordManager  = new Interface("IPasswordManager", ['makeSalt', 'makePasswordHash']),
     passmgr = null,
     SUPER_PASSWORD = 'mysuperpassord';
     
