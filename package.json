@@ -15,7 +15,8 @@
     "express": "3.0.3",
     "jade": "*",
     "less-middleware": "*",
-    "mongodb" : "*"
+    "mongodb" : "*",
+    "secure_random" : "*"
   },
   "publicConfig": {
     "http_port": 3000,
