@@ -1,4 +1,4 @@
-{ "_id" : "user1", "password" : "notencruptedpassword" }
-{ "_id" : "user2", "password" : "notencruptedpassword" }
-{ "_id" : "user3", "password" : "notencruptedpassword" }
-{ "_id" : "user4", "password" : "notencruptedpassword" }
+{ "_id" : "user1", "password" : "c7718f2f7783327044b4b2cd330f04f5199db76cac883b62ced465c56132558b,egvuG", email : "user1@email.com" }
+{ "_id" : "user2", "password" : "notencruptedpassword", email : "user2@email.com" }
+{ "_id" : "user3", "password" : "notencruptedpassword", email : "user3@email.com" }
+{ "_id" : "user4", "password" : "notencruptedpassword", email : "user4@email.com" }
