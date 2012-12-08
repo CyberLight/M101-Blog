@@ -1,5 +1,5 @@
 {
-  "name": "application-name",
+  "name": "M101-Blog",
   "version": "0.0.1",
   "private": true,
   "scripts": {
@@ -15,7 +15,7 @@
     "express": "3.0.3",
     "jade": "*",
     "less-middleware": "*",
-    "mongodb" : "*",
+    "mongodb" : "latest",
     "secure_random" : "*"
   },
   "publicConfig": {
@@ -23,6 +23,16 @@
     "request_timeout": 10000,
     "session_secret": "MySuperSecretKey",
     "log_requests": false,    
-    "test": false
+    "test": false,
+    "db" : {
+        "name" : "M101Test",
+        "host" : "localhost",
+        "port" : 27017,    
+        "options" : { 
+            "auto_reconnect" : true, 
+            "poolSize" : 4, 
+            "socketOptions" : { "encoding" : "utf-8" } 
+        }
+    }
   }
 }

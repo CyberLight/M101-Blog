@@ -1,6 +1,6 @@
 @echo off
 IF "%1" == "test" (
-	node_modules\.bin\mocha --ui bdd --reporter spec tests
+	node_modules\.bin\mocha --ui bdd --timeout 10s --reporter spec tests
 	GOTO end
 ) 
 
