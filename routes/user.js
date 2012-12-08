@@ -17,7 +17,6 @@ function validateSignUp(data){
     
     validationRules.push(function(data){ 
         var result = {};
-        console.log(data.username);
         result["success"] = new RegExp(/^[a-zA-Z0-9_-]{3,20}$/i).test(data.username);
         result["error"] = !result.success ? "invalid username. try just letters and numbers" : "";
         result["type"] = "username-error";
@@ -61,8 +60,15 @@ function validateSignUp(data){
     return validationResponse;
 }
  
-function renderSignUp(req, res, errors){
-    res.render(SIGNUP_VIEW_NAME, { title: TITLE_OF_SIGNUP_PAGE,  errors : errors} );
+function renderSignUp(req, res, errors, user){
+    var defUser = { 
+        username : '', 
+        password : '', 
+        verify : '', 
+        email : ''
+    },
+    formUser = (user ? user : defUser);
+    res.render(SIGNUP_VIEW_NAME, { title: TITLE_OF_SIGNUP_PAGE,  errors : errors, "user" : formUser} );
 } 
  
 exports.list = function(req, res){
@@ -74,22 +80,25 @@ exports.signup = function(req, res){
 };
 
 exports.post = function(req, res){
-    var result = validateSignUp(req.body);
-    if(result.success){    
+    var userData = req.body.user,
+        result = validateSignUp(userData);
+    
+    if(result.success){
         services.getUserService(function(err, us){
-            var data = req.body,
+            var data = req.body.user,
                 user = {_id : data.username, password : data.password, email : data.email};
             us.createUser(user, function(err, users){
-                if(err){                    
-                    renderSignUp(req, res, result);
+                if(err){
+                    result['form-error'] = err.message;
+                    renderSignUp(req, res, result, userData);
                 }else{
                     res.redirect(301, '/login');
                 }
             });
         });
     }else{
-       renderSignUp(req, res, result);
-    }            
+       renderSignUp(req, res, result, userData);
+    }
 }
 
 exports.login = function(req, res){

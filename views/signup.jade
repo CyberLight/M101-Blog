@@ -4,20 +4,34 @@ block content
   form(method="post")
     div.signupform
         h1= title
-        label 
-          | User name:
-          input(type="text", name="username")
-          div#username-error= errors["username-error"]
-        label
-          | Password:
-          input(type="password", name="password")
-          div#password-error= errors["password-error"]
-        label
-          | Verify password:
-          input(type="password", name="verify")
-          div#verify-error= errors["verify-error"]
-        label
-          | E-mail (optional):
-          input(type="email", name="email")
-          div#email-error= errors["email-error"]
-        input(type="submit")
+        -if(user)
+            -if(errors["form-error"])
+              div.form-error= errors["form-error"]
+            div.form-element
+              label 
+               | User name:
+              input(type="text", name="user[username]", value=user.username)
+              -if(errors["username-error"])
+                div#username-error.error= errors["username-error"]
+            div.form-element
+              label
+               | Password:
+              input(type="password", name="user[password]", value=user.password)
+              -if(errors["password-error"])
+                div#password-error.error= errors["password-error"]
+            div.form-element
+              label
+               | Verify password:
+              input(type="password", name="user[verify]", value=user.verify)
+              -if(errors["verify-error"])
+                div#verify-error.error= errors["verify-error"]
+            div.form-element
+              label
+               | E-mail (optional):
+              input(type="email", name="user[email]", value=user.email)
+              -if(errors["email-error"])
+                div#email-error.error= errors["email-error"]
+            input(type="submit")
+        -else
+           div 
+            | Oops problems with user data :(

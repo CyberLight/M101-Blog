@@ -13,7 +13,8 @@ var mocha = require('../node_modules/mocha'),
     USER_NAME = "cyberlight",
     USER_PASSWORD = "t3stP@$$w0Rd",
     E_MAIL = "",
-    EMPTY_DATA_VALUE="";
+    EMPTY_DATA_VALUE="",
+    NOT_MATCHED_PASSWORD = "nOtMaTcHeD_PassWord";
     
 testUtils.startApp(3000);
 
@@ -32,10 +33,14 @@ function logError(err){
 function postData(username, password, verify, email, cb){
     agent.post(httpRootPath+'/signup')
                      .type('form')
-                     .send({username : username})
-                     .send({password : password})
-                     .send({verify : verify})
-                     .send({email : email})
+                     .send({ user : 
+                                { 
+                                    username : username,
+                                    password : password,
+                                    verify : verify,
+                                    email : email
+                                }
+                           })
                      .end(cb);
 }
 
@@ -73,7 +78,7 @@ describe('User signup page',function(){
                 function(err, res){
                     logError(err);
                         
-                    res.status.should.equal(200);                
+                    res.status.should.equal(200);
                     done();
                 }
             );
@@ -101,20 +106,22 @@ describe('User signup page',function(){
         
         describe('send valid user credentials to "' + httpRootPath + '/login"', function(){        
             it('should return http status 200', function(done){
-                postData(
-                
-                    USER_NAME, 
-                    USER_PASSWORD, 
-                    USER_PASSWORD, 
-                    E_MAIL,
+                importUsersData(function(){
+                    postData(
                     
-                    function(err, res){
-                        logError(err);
+                        USER_NAME, 
+                        USER_PASSWORD, 
+                        USER_PASSWORD, 
+                        E_MAIL,
                         
-                        res.status.should.equal(200);
-                        done();
-                    }
-                );
+                        function(err, res){
+                            logError(err);
+                            
+                            res.status.should.equal(200);
+                            done();
+                        }
+                    );
+                });
             });
             
             it("should redirect to /login page for valid user data with not empty e-mail 'mymail@gmail.com'", function(done){
@@ -130,7 +137,44 @@ describe('User signup page',function(){
                             
                             res.status.should.equal(200);
                             res.redirects.should.include(httpRootPath+'/login');                                                                                                                                         
-                            done();                            
+                            done();
+                        }
+                    );
+                });
+            });
+            
+            it("should not redirect to /login page for existing user in database", function(done){
+                importUsersData(function(){
+                    postData(
+                        "user1", 
+                        USER_PASSWORD, 
+                        USER_PASSWORD, 
+                        "user1@email.com",
+                        
+                        function(err, res){
+                            logError(err);
+                            
+                            res.status.should.equal(200);
+                            res.redirects.should.be.empty;
+                            done();
+                        }
+                    );
+                });
+            });
+            
+            it("should show error info after post data on /signup page for existing user in database", function(done){
+                importUsersData(function(){
+                    postData(
+                        "user1", 
+                        USER_PASSWORD, 
+                        USER_PASSWORD, 
+                        "user1@email.com",
+                        
+                        function(err, res){
+                            logError(err);
+                            var $ = cheerio.load(res.text);
+                            $('.form-error').text().should.be.equal('User \"user1\" already exists');
+                            done();
                         }
                     );
                 });
@@ -143,7 +187,7 @@ describe('User signup page',function(){
                 
                     USER_NAME, 
                     USER_PASSWORD, 
-                    'nOtMaTHeD_PassWord', 
+                    NOT_MATCHED_PASSWORD, 
                     E_MAIL,
                     
                     function(err, res){
@@ -173,7 +217,7 @@ describe('User signup page',function(){
                 );
             });
             
-            it("should show error for invalid e-mail value 'm@.com'", function(done){                
+            it("should show error for invalid e-mail value 'm@.com'", function(done){
                 postData(
                     USER_NAME, 
                     USER_PASSWORD, 
@@ -184,11 +228,32 @@ describe('User signup page',function(){
                         logError(err);
                         
                         var $ = cheerio.load(res.text);
-                        $('div#email-error').text().should.be.equal("invalid email address");                                                                                                                                           
-                        done();                            
+                        $('div#email-error').text().should.be.equal("invalid email address");
+                        done();
                     }
                 );
-            });            
+            }); 
+
+            it('should display previously entered data for text fields after POST request', function(done){
+                postData(
+                    
+                    USER_NAME, 
+                    USER_PASSWORD, 
+                    NOT_MATCHED_PASSWORD, 
+                    E_MAIL,
+                    
+                    function(err, res){
+                        logError(err);
+                        
+                        var $ = cheerio.load(res.text);
+                        $('input[name="user[username]"]').attr('value').should.be.equal(USER_NAME);
+                        $('input[name="user[password]"]').attr('value').should.be.equal(USER_PASSWORD);
+                        $('input[name="user[verify]"]').attr('value').should.be.equal(NOT_MATCHED_PASSWORD);
+                        $('input[name="user[email]"]').attr('value').should.be.equal(E_MAIL);
+                        done();
+                    }
+                );
+            });
             
             describe("with empty fields data for user", function(){
                 it("should not redirect to login page", function(done){
@@ -220,12 +285,12 @@ describe('User signup page',function(){
                             var $ = cheerio.load(res.text);
                             $('div#username-error').text().should.be.equal('invalid username. try just letters and numbers');
                             $('div#password-error').text().should.be.equal('invalid password');
-                            $('div#verify-error').text().should.be.equal('password must match');                            
+                            $('div#verify-error').text().should.be.equal('password must match');
                             done();
                         }
                     )
-                });                
-            });            
+                });
+            });
         });
     });
 });
