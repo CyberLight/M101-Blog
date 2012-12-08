@@ -22,6 +22,10 @@ var UserService = require('../lib/services/user.service').UserService,
     user1WrongPass = {
         _id : 'user1',
         password : 'WrongPassword1'
+    },    
+    userNotExistInDb = {
+        _id : 'notExistUserName',
+        password : 'SomePassword'
     };
 
 function importUsersData(cb){
@@ -72,7 +76,54 @@ describe("User Service class tests", function(){
          });
     });
     
-    it("should validation success for user by login amd right password", function(done){   
+     it("should return error when try create user which already exist in database", function(done){
+        importUsersData(function(){
+            userService.createUser(testUser1, 
+                                   function(err, users){
+                                        userService.createUser(
+                                            testUser1, 
+                                            function(err, users){
+                                                console.log(err);
+                                                should.exist(err);
+                                                done();
+                                            }
+                                        );
+                                   });
+         });
+    });
+    
+    it("should return business exception when try create user which already exist in database", function(done){
+        importUsersData(function(){
+            userService.createUser(testUser1, 
+                                   function(err, users){
+                                        userService.createUser(
+                                            testUser1, 
+                                            function(err, users){
+                                                console.log(err);
+                                                for(var prop in err){
+                                                    console.log(prop);
+                                                }
+                                                err.message.should.be.equal("User \"testUser1\" already exists");
+                                                err.name.should.be.equal("UserAlreadyExistError");
+                                                done();
+                                            }
+                                        );
+                                   });
+         });
+    }); 
+
+    it("should return business exception when try validate login for non-existant user", function(done){
+         importUsersData(function(){
+            userService.validateLogin(userNotExistInDb, function(err, users){
+                should.exist(err);
+                err.message.should.be.equal("Invalid Login");
+                err.name.should.be.equal("InvalidLoginError");
+                done();
+            })
+         });
+    });
+    
+    it("should validation success for user by login and correct password", function(done){
         importUsersData(function(){
             userService.validateLogin(user1, function(err, result){
                 should.not.exist(err);
