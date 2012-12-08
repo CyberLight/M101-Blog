@@ -100,9 +100,6 @@ describe("User Service class tests", function(){
                                             testUser1, 
                                             function(err, users){
                                                 console.log(err);
-                                                for(var prop in err){
-                                                    console.log(prop);
-                                                }
                                                 err.message.should.be.equal("User \"testUser1\" already exists");
                                                 err.name.should.be.equal("UserAlreadyExistError");
                                                 done();
