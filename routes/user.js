@@ -2,7 +2,8 @@
 /*
  * GET users listing.
  */
-var TITLE_OF_SIGNUP_PAGE = 'Sign up',
+var services = require('../lib/data/services').services;
+    TITLE_OF_SIGNUP_PAGE = 'Sign up',
     SIGNUP_VIEW_NAME = 'signup',
     EMPTY_ERRORS = {"username-error" : "", 
                    "password-error" : "",
@@ -75,7 +76,17 @@ exports.signup = function(req, res){
 exports.post = function(req, res){
     var result = validateSignUp(req.body);
     if(result.success){    
-        res.redirect(301, '/login');
+        services.getUserService(function(err, us){
+            var data = req.body,
+                user = {_id : data.username, password : data.password, email : data.email};
+            us.createUser(user, function(err, users){
+                if(err){                    
+                    renderSignUp(req, res, result);
+                }else{
+                    res.redirect(301, '/login');
+                }
+            });
+        });
     }else{
        renderSignUp(req, res, result);
     }            

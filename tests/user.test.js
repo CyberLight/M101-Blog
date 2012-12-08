@@ -5,13 +5,24 @@ var mocha = require('../node_modules/mocha'),
 	testUtils = require("../lib/shared/test.utils"),
 	cheerio = require('cheerio'),
 	agent = superagent.agent(),
+    MdbUnit = require("../lib/utils/database/mdb.unit").MdbUnit,
+    mDbImport = new MdbUnit.Import(),
 	httpRootPath = 'http://localhost:3000',
+    DB_NAME = "M101Test",
+    COL_USERS = "users",
     USER_NAME = "cyberlight",
     USER_PASSWORD = "t3stP@$$w0Rd",
     E_MAIL = "",
     EMPTY_DATA_VALUE="";
     
 testUtils.startApp(3000);
+
+function importUsersData(cb){
+     mDbImport.setDb(DB_NAME).setCollection(COL_USERS).setDrop(true).importData("tests\\importData\\users.json", function(code){
+        code.should.be.equal(0);
+        cb();
+    });
+}
 
 function logError(err){
     if(err)
@@ -27,6 +38,7 @@ function postData(username, password, verify, email, cb){
                      .send({email : email})
                      .end(cb);
 }
+
 
 describe('User signup page',function(){
 	describe('GET /signup', function(){
@@ -68,21 +80,23 @@ describe('User signup page',function(){
         });
         
         it('and should be redirected to "' + httpRootPath + '/login"', function(done){
-            postData(
-                
-                USER_NAME, 
-                USER_PASSWORD, 
-                USER_PASSWORD, 
-                E_MAIL,
+            importUsersData(function(){
+                postData(
                     
-                function(err, res){
-                    logError(err);
-                    
-                    res.status.should.equal(200);
-                    res.redirects.should.include(httpRootPath+'/login');
-                    done();
-                }
-            );
+                    USER_NAME, 
+                    USER_PASSWORD, 
+                    USER_PASSWORD, 
+                    E_MAIL,
+                        
+                    function(err, res){
+                        logError(err);
+                        
+                        res.status.should.equal(200);
+                        res.redirects.should.include(httpRootPath+'/login');
+                        done();
+                    }
+                );
+            });
         });
         
         describe('send valid user credentials to "' + httpRootPath + '/login"', function(){        
@@ -103,21 +117,23 @@ describe('User signup page',function(){
                 );
             });
             
-            it("should redirect to /login page for valid user data with not empty e-mail 'mymail@gmail.com'", function(done){                
-                postData(
-                    USER_NAME, 
-                    USER_PASSWORD, 
-                    USER_PASSWORD, 
-                    "mymail@gmail.com",
-                    
-                    function(err, res){
-                        logError(err);
+            it("should redirect to /login page for valid user data with not empty e-mail 'mymail@gmail.com'", function(done){
+                importUsersData(function(){
+                    postData(
+                        USER_NAME, 
+                        USER_PASSWORD, 
+                        USER_PASSWORD, 
+                        "mymail@gmail.com",
                         
-                        res.status.should.equal(200);
-                        res.redirects.should.include(httpRootPath+'/login');                                                                                                                                         
-                        done();                            
-                    }
-                );
+                        function(err, res){
+                            logError(err);
+                            
+                            res.status.should.equal(200);
+                            res.redirects.should.include(httpRootPath+'/login');                                                                                                                                         
+                            done();                            
+                        }
+                    );
+                });
             });
         });
         
