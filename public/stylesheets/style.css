@@ -95,3 +95,10 @@ a {
   font-style: italic;
   padding-left: 25px;
 }
+.user-toolbar-form {
+  text-align: right;
+  line-height: 30px;
+}
+.user-toolbar-form a {
+  margin: 5px;
+}

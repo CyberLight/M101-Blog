@@ -1,5 +1,13 @@
 extends layout
 
 block content
+  div.user-toolbar-form
+   -if(!user.isAuthenticated)
+     a.login(href="/login") Login
+     a.signup(href="/signup") Sign up
+   -else
+     span.username= "Welcome: " + user.name
+     a.logout(href="/logout") Logout
+     a.new-post(href="/post/new") New Post
   h1= title
   p Welcome to #{title}

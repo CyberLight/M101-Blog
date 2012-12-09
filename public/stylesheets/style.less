@@ -7,7 +7,7 @@
 }
 .common-error(){
     margin-top: 5px;
-    padding: 5px;            
+    padding: 5px;
     color : red;
     background-color: #FAA5A6;
     border: solid 1px red;
@@ -62,7 +62,7 @@ a {
         input[type=text]:hover{
             border: 1px solid #b9b9b9;
             border-top: 1px solid #a0a0a0;
-            .modern-box-shadow(rgba(0,0,0,0.1));            
+            .modern-box-shadow(rgba(0,0,0,0.1));
         }
         
         input[type=email]:focus,
@@ -70,7 +70,7 @@ a {
         input[type=text]:focus{
             outline: none;
             border: 1px solid #4d90fe;
-            .modern-box-shadow(rgba(0,0,0,0.3));             
+            .modern-box-shadow(rgba(0,0,0,0.3));
         }
             
         .error{
@@ -80,12 +80,20 @@ a {
         
     input[type="submit"]{
         font-weight: bold;
-        margin-top: @signup-margin-top;            
+        margin-top: @signup-margin-top;
     }
     
     .form-error{
-        .common-error;        
+        .common-error;
         padding-left: 25px;
     }
 
+}
+
+.user-toolbar-form{
+    text-align: right;
+    line-height: 30px;
+    a {
+        margin : 5px;
+    }
 }

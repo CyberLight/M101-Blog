@@ -123,6 +123,7 @@ exports.postLogin = function(req, res){
         var userCredentials = {_id : userData.username, password : userData.password};
         us.validateLogin(userCredentials, function(err, isValid){
            if(isValid){
+              res.cookie('username', userData.username, { signed: true });
               res.redirect(301, '/');
            }else{
               errors['form-error'] = err.message;
