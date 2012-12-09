@@ -53,7 +53,7 @@ function validateSignUp(data){
     var success = true;
         
     for(var i=0, len=validationRules.length; i<len; i++){
-        var result = validationRules[i](data);     
+        var result = validationRules[i](data);
         validationResponse[result.type] = result.error;
         success &= result.success;
     }    
@@ -74,7 +74,12 @@ function renderSignUp(req, res, errors, user){
 } 
 
 function renderLogin(req, res, errors, user){
-    res.render(LOGIN_VIEW_NAME, { title: TITLE_OF_LOGIN_PAGE, errors : {}, user : {}} );
+    var defUser = { 
+            username : '', 
+            password : '' 
+    },
+    formUser = (user ? user : defUser);
+    res.render(LOGIN_VIEW_NAME, { title: TITLE_OF_LOGIN_PAGE, errors : errors, user : formUser} );
 } 
  
 exports.list = function(req, res){
@@ -105,12 +110,24 @@ exports.postSignUp = function(req, res){
     }else{
        renderSignUp(req, res, result, userData);
     }
-}
+};
 
 exports.login = function(req, res){
-    renderLogin(req, res);
-}
+    renderLogin(req, res, EMPTY_ERRORS);
+};
 
 exports.postLogin = function(req, res){
-    res.send(200);
-}
+    var userData = req.body.user,
+        errors = {};
+    services.getUserService(function(err, us){
+        var userCredentials = {_id : userData.username, password : userData.password};
+        us.validateLogin(userCredentials, function(err, isValid){
+           if(isValid){
+              res.redirect(301, '/');
+           }else{
+              errors['form-error'] = err.message;
+              renderLogin(req, res, errors, userData);
+           }
+        });
+    });
+};

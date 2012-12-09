@@ -344,5 +344,53 @@ describe("Login page tests", function(){
                 }
             );
         });        
+        
+        it('should redirect to / after posing valid username and password', function(done){ 
+            postLoginData(
+            
+                "user1", 
+                "password1",
+                
+                function(err, res){
+                    logError(err);
+                    
+                    res.status.should.equal(200);
+                    
+                    res.redirects.should.include(httpRootPath+'/');    
+                    done();
+                }
+            );
+        });
+        
+        it('should not redirect to / after posing not valid user credentials', function(done){ 
+            postLoginData(
+            
+                "user1", 
+                "password2",
+                
+                function(err, res){
+                    logError(err);
+                    
+                    res.redirects.should.be.empty;  
+                    done();
+                }
+            );
+        });
+        
+        
+        it("should contains error info after posing not valid user credentials", function(done){
+            postLoginData(
+                "user1", 
+                "password2",
+                
+                function(err, res){
+                    logError(err);
+                    
+                    var $ = cheerio.load(res.text);
+                    $('.form-error').text().should.equal("Invalid Login");	
+                    done();
+                }
+            );
+        });
     });
 });
