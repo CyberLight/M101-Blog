@@ -1,0 +1,17 @@
+extends layout
+
+block content
+  form(method="post")
+    div.loginform
+      h1= title
+      -if(errors["form-error"])
+        div.form-error= errors["form-error"]
+      div.form-element
+       label 
+        | User name:
+       input(type="text", name="user[username]", value=user.username)       
+      div.form-element
+       label
+        | Password:
+       input(type="password", name="user[password]", value=user.password)
+      input(type="submit")

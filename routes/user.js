@@ -4,7 +4,9 @@
  */
 var services = require('../lib/data/services').services;
     TITLE_OF_SIGNUP_PAGE = 'Sign up',
+    TITLE_OF_LOGIN_PAGE = 'Login'
     SIGNUP_VIEW_NAME = 'signup',
+    LOGIN_VIEW_NAME = 'login',
     EMPTY_ERRORS = {"username-error" : "", 
                    "password-error" : "",
                    "verify-error" : "",
@@ -70,6 +72,10 @@ function renderSignUp(req, res, errors, user){
     formUser = (user ? user : defUser);
     res.render(SIGNUP_VIEW_NAME, { title: TITLE_OF_SIGNUP_PAGE,  errors : errors, "user" : formUser} );
 } 
+
+function renderLogin(req, res, errors, user){
+    res.render(LOGIN_VIEW_NAME, { title: TITLE_OF_LOGIN_PAGE, errors : {}, user : {}} );
+} 
  
 exports.list = function(req, res){
   res.send("respond with a resource");
@@ -79,7 +85,7 @@ exports.signup = function(req, res){
 	renderSignUp(req, res, EMPTY_ERRORS);
 };
 
-exports.post = function(req, res){
+exports.postSignUp = function(req, res){
     var userData = req.body.user,
         result = validateSignUp(userData);
     
@@ -102,5 +108,9 @@ exports.post = function(req, res){
 }
 
 exports.login = function(req, res){
+    renderLogin(req, res);
+}
+
+exports.postLogin = function(req, res){
     res.send(200);
 }

@@ -44,6 +44,18 @@ function postData(username, password, verify, email, cb){
                      .end(cb);
 }
 
+function postLoginData(username, password, cb){
+    agent.post(httpRootPath+'/login')
+                     .type('form')
+                     .send({ user : 
+                                { 
+                                    username : username,
+                                    password : password                                   
+                                }
+                           })
+                     .end(cb);
+}
+
 
 describe('User signup page',function(){
 	describe('GET /signup', function(){
@@ -292,5 +304,45 @@ describe('User signup page',function(){
                 });
             });
         });
+    });
+});
+
+describe("Login page tests", function(){
+    describe('GET /login', function(){
+		it('should be return 200 http status', function(done){
+			agent.get(httpRootPath+'/login').end(function(err, res){
+				logError(err);
+                
+				res.status.should.equal(200);
+				done();
+			});
+		});
+
+        it("should include 'Login' on page", function(done){
+            agent.get(httpRootPath+'/login').end(function(err, res){
+				logError(err);
+                
+				var $ = cheerio.load(res.text);
+				$('h1').text().should.equal("Login");				
+				done();
+			});
+        });
+	});
+    
+    describe('POST /login', function(){
+        it('should return 200 http status', function(done){ 
+            postLoginData(
+            
+                "user1", 
+                "password1",                 
+                
+                function(err, res){
+                    logError(err);
+                        
+                    res.status.should.equal(200);
+                    done();
+                }
+            );
+        });        
     });
 });
