@@ -130,11 +130,23 @@ describe("User Service class tests", function(){
         });
     });
     
-    it("should validation fail of user by existed login amd wrong password", function(done){   
+    it("should validation fail of user by existed login and wrong password", function(done){   
         importUsersData(function(){
             userService.validateLogin(user1WrongPass, function(err, result){
-                should.not.exist(err);
+                should.exist(err);
                 result.should.be.equal(false);
+                done();
+            }); 
+        });
+    });
+    
+    it("should validation of user fail with error 'Invalid Login' by existed login and wrong password", function(done){
+        importUsersData(function(){
+            userService.validateLogin(user1WrongPass, function(err, result){
+                should.exist(err);
+                result.should.be.equal(false);
+                err.name.should.be.equal('InvalidLoginError');
+                err.message.should.be.equal('Invalid Login');
                 done();
             }); 
         });
