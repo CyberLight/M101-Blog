@@ -5,34 +5,35 @@ body {
 a {
   color: #00B7FF;
 }
-.signupform,
-.loginform {
-  width: 250px;
-  margin-left: auto;
-  margin-right: auto;
-}
-.signupform .form-element label,
-.loginform .form-element label {
-  display: block;
-  font-weight: bold;
-  margin-top: 10px;
-}
-.signupform .form-element input[type="text"],
-.loginform .form-element input[type="text"],
-.signupform .form-element input[type="password"],
-.loginform .form-element input[type="password"],
-.signupform .form-element input[type="email"],
-.loginform .form-element input[type="email"] {
-  width: 100%;
+.postform .form-element input[type="text"],
+.postform .form-element input[type="password"],
+.postform .form-element input[type="email"] {
   height: 32px;
   font-size: 15px;
 }
-.signupform .form-element input[type="text"],
-.loginform .form-element input[type="text"],
-.signupform .form-element input[type="password"],
-.loginform .form-element input[type="password"],
-.signupform .form-element input[type="email"],
-.loginform .form-element input[type="email"] {
+.postform .form-element .post-title {
+  width: 50%;
+}
+.postform .form-element .post-tags {
+  width: 50%;
+}
+.postform input[type="submit"] {
+  font-weight: bold;
+  margin-top: 10px;
+}
+.form-element label {
+  display: block;
+  font-weight: bold;
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+.form-element span {
+  display: block;
+  margin-bottom: 10px;
+}
+.form-element input[type="text"],
+.form-element input[type="password"],
+.form-element input[type="email"] {
   display: inline-block;
   height: 29px;
   margin: 0;
@@ -47,38 +48,47 @@ a {
   -moz-border-radius: 1px;
   border-radius: 1px;
 }
-.signupform .form-element input[type=email]:hover,
-.loginform .form-element input[type=email]:hover,
-.signupform .form-element input[type=password]:hover,
-.loginform .form-element input[type=password]:hover,
-.signupform .form-element input[type=text]:hover,
-.loginform .form-element input[type=text]:hover {
+.form-element input[type=email]:hover,
+.form-element input[type=password]:hover,
+.form-element input[type=text]:hover {
   border: 1px solid #b9b9b9;
   border-top: 1px solid #a0a0a0;
   -webkit-box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1);
   -moz-box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1);
   box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1);
 }
-.signupform .form-element input[type=email]:focus,
-.loginform .form-element input[type=email]:focus,
-.signupform .form-element input[type=password]:focus,
-.loginform .form-element input[type=password]:focus,
-.signupform .form-element input[type=text]:focus,
-.loginform .form-element input[type=text]:focus {
+.form-element input[type=email]:focus,
+.form-element input[type=password]:focus,
+.form-element input[type=text]:focus {
   outline: none;
   border: 1px solid #4d90fe;
   -webkit-box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.3);
   -moz-box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.3);
   box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.3);
 }
-.signupform .form-element .error,
-.loginform .form-element .error {
+.form-element .error {
   margin-top: 5px;
   padding: 5px;
   color: red;
   background-color: #FAA5A6;
   border: solid 1px red;
   font-style: italic;
+}
+.signupform,
+.loginform {
+  width: 250px;
+  margin-left: auto;
+  margin-right: auto;
+}
+.signupform .form-element input[type="text"],
+.loginform .form-element input[type="text"],
+.signupform .form-element input[type="password"],
+.loginform .form-element input[type="password"],
+.signupform .form-element input[type="email"],
+.loginform .form-element input[type="email"] {
+  width: 100%;
+  height: 32px;
+  font-size: 15px;
 }
 .signupform input[type="submit"],
 .loginform input[type="submit"] {
