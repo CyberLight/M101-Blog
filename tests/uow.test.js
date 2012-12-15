@@ -3,12 +3,12 @@ var mocha = require('../node_modules/mocha'),
     should = require('../node_modules/should'),
     UoW = require('../lib/data/uow').UoW,
     Interface = require('../lib/interfaces/interface').jspatterns.contracts.Interface,
-    IUow = new Interface("IUow", ['users']),
+    IUow = new Interface("IUow", ['users', 'posts']),
     uow = null,
     server = null,
     db = null;
 
-beforeEach(function(){        
+beforeEach(function(){
     server = new mongodb.Server("localhost", 27017, {auto_reconnect : true, poolSize : 4, socketOptions : {encoding : "utf-8"}});
 	db = new mongodb.Db(DB_NAME, server, {safe: true});
 	db.on("close", function(error){
@@ -19,7 +19,7 @@ beforeEach(function(){
     
 describe("Unit of Work tests", function(){
 
-    it("should created successfull", function(){                
+    it("should created successfull", function(){
         should.exist(uow);
     });
     
@@ -41,5 +41,13 @@ describe("Unit of Work tests", function(){
             returnedDb.should.be.equal(db);
         });
 
+    });
+    
+    describe("'posts' property of UoW", function(){
+        
+        it("should return posts repository from 'posts' of UoW", function(){
+            uow.posts().collection.should.be.equal('posts');
+        });
+        
     });
 });
