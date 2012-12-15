@@ -11,3 +11,15 @@ block content
      a.new-post(href="/post/new") New Post
   h1= title
   p Welcome to #{title}
+  
+  div.posts-list
+    -if(posts.length)
+      each post in posts
+        div.post          
+          section.title-placeholder
+            a.post-title(href= post.viewlink)= post.title
+          section.post-preview-placeholder
+            section.date-of-post= post.publishDate
+            section.post-preview= post.body         
+          section.right-tileLabel
+            a.more(href='#') more...

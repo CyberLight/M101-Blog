@@ -1,6 +1,8 @@
 body {
   padding: 50px;
-  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+  font: 14px "Segoe UI", Helvetica, Arial, sans-serif;
+  /*"Lucida Grande", Helvetica, Arial, sans-serif;*/
+
 }
 a {
   color: #00B7FF;
@@ -111,4 +113,60 @@ a {
 }
 .user-toolbar-form a {
   margin: 5px;
+}
+.posts-list {
+  width: 600px;
+}
+.posts-list .post {
+  height: 151px;
+  border-bottom: solid 1px lightgray;
+  border-right: solid 1px lightgray;
+  margin-top: 10px;
+}
+.posts-list .post .right-tileLabel {
+  padding: 2px 2px 1px 2px;
+  border-left: 15px solid transparent;
+  border-bottom: 20px solid #333;
+  height: 0;
+  line-height: 22px;
+  color: white;
+  width: 10%;
+  float: right;
+}
+.posts-list .post .title-placeholder {
+  font-size: 17px;
+  padding: 5px;
+}
+.posts-list .post .title-placeholder .post-title {
+  text-decoration: none;
+  font-weight: bolder;
+  font-family: "Segoe UI", Helvetica, Arial, sans-serif;
+  color: #666;
+}
+.posts-list .post .post-preview-placeholder {
+  margin: 5px;
+  height: 86px;
+}
+.posts-list .post .post-preview-placeholder .post-preview {
+  margin-left: 10px;
+}
+.posts-list .post .post-preview-placeholder .date-of-post {
+  height: 100%;
+  width: 100px;
+  float: left;
+  font-size: 20px;
+  font-weight: bolder;
+  padding-top: 5px;
+  margin-right: 10px;
+  color: lightgray;
+  text-align: center;
+}
+.posts-list .post .post-preview-placeholder .date-of-post:hover {
+  background-color: #333;
+  color: white;
+}
+.posts-list .post .more {
+  color: whiteSmoke;
+  text-align: right;
+  text-decoration: none;
 }
