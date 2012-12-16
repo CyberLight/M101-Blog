@@ -137,11 +137,18 @@ a {
   font-size: 17px;
   padding: 5px;
 }
+.posts-list .post .title-placeholder .title-icon {
+  font-size: 1.1em;
+  margin-right: 5px;
+}
 .posts-list .post .title-placeholder .post-title {
   text-decoration: none;
   font-weight: bolder;
   font-family: "Segoe UI", Helvetica, Arial, sans-serif;
   color: #666;
+}
+.posts-list .post .title-placeholder .post-title:hover {
+  color: black;
 }
 .posts-list .post .post-preview-placeholder {
   margin: 5px;
@@ -197,4 +204,14 @@ a {
 .comments-ribbon .post-comment .content {
   margin: 5px 5px 10px 5px;
   width: 600px;
+}
+.goback {
+  text-decoration: none;
+  color: lightgray;
+  font-size: 3.2em;
+  float: left;
+  margin-right: 10px;
+}
+.goback:hover {
+  color: #666;
 }

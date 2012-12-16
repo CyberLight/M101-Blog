@@ -17,9 +17,10 @@ block content
       each post in posts
         div.post          
           section.title-placeholder
+            span.icon.title-icon E
             a.post-title(href= post.viewlink)= post.title
           section.post-preview-placeholder
             section.date-of-post= post.publishDate
             section.post-preview= post.body         
           section.right-tileLabel
-            a.more(href='#') more...
+            a.more(href='/post/' + post.permalink +'/view') more...

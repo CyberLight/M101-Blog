@@ -2,11 +2,8 @@ extends layout
 
 block content
     div.postform
-      h1= title
-      div.form-element
-        label
-          | Title:
-        div.post-title-view= post.title
+      a.icon.goback(href="/") <
+      h1.post-title-view= post.title      
       div.form-element
         label
           | Post content:

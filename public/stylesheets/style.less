@@ -150,11 +150,18 @@ a {
         .title-placeholder{
             font-size: 17px;
             padding: 5px;
+            .title-icon{
+                font-size: 1.1em;
+                margin-right: 5px;
+            }
             .post-title{
                 text-decoration:none;            
                 font-weight: bolder;
                 font-family: "Segoe UI", Helvetica, Arial, sans-serif;
                 color: #666;
+                &:hover{
+                    color: black;
+                }
             }
         }
         .post-preview-placeholder{
@@ -220,4 +227,15 @@ a {
             width: 600px;           
         }        
     }   
+}
+
+.goback{
+    text-decoration: none;
+    color : lightgray;
+    font-size: 3.2em;
+    float: left;
+    margin-right: 10px;
+    &:hover{
+        color : #666;
+    }
 }
