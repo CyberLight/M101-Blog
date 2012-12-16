@@ -27,7 +27,8 @@ will be distracted by the readable content of a page when looking at its layout.
         title : 'My today post title #1',
         body : 'My today post #1:' + TEST_POST_BODY,
         tags : 'sun, smile, light'
-    };
+    },
+    TEST_POST_PERMALINK = '140f01bfd2f126e4d99128a6cf8e5d17';
     
 function importUsersData(cb){
      mDbImport.setDb(DB_NAME).setCollection(COL_USERS).setDrop(true).importData("tests\\importData\\users.json", function(code){
@@ -50,6 +51,11 @@ function importPostsData(cb){
 
 function goToNewPost(cb){
      agent.get(httpRootPath+"/post/new")
+                     .end(cb);
+}
+
+function goToViewPostByPermalink(permalink, cb){
+     agent.get(httpRootPath+"/post/" + permalink + '/view')
                      .end(cb);
 }
 
@@ -102,6 +108,18 @@ function postEntryData(titlev, bodyv, tagsv, cb){
                      .end(cb);
 }
 
+function addCommentToPost(permalink, authorv, emailv, bodyv, cb){
+     agent.post(httpRootPath+'/post/' + permalink + '/addcomment')
+                     .type('form')
+                     .send({ comment : 
+                                { 
+                                    author : authorv,
+                                    email : emailv,
+                                    body : bodyv
+                                }
+                           })
+                     .end(cb);
+}
 
 describe("/post/new page tests", function(){
     
@@ -120,8 +138,13 @@ describe("/post/new page tests", function(){
                         logError(err);
                         res.redirects.should.include(httpRootPath+'/login');
                         done();
-                     });                     
+                     });
             });
+        });
+    });
+        
+    describe("POST /post/new", function(){ 
+        describe("For anonymous users", function(){ 
             it("should redirect to login page after attempting send new post without login", function(done){
                  importUsersData(function(){
                    importPostsData(function(){
@@ -140,7 +163,7 @@ describe("/post/new page tests", function(){
                  });
             });
         });
-        
+    
         describe("For authenticated users", function(){
             it("should not redirect to login page", function(done){
                 importUsersData(function(){
@@ -211,6 +234,80 @@ describe("/post/new page tests", function(){
                    });
                 });
             });
-        });       
+        });
     });
+    
+    describe("Comments for post", function(){
+        describe("for anonymous user", function(){
+            it("should display region for adding comment", function(done){
+                importUsersData(function(){
+                    importPostsData(function(){
+                            goToViewPostByPermalink('140f01bfd2f126e4d99128a6cf8e5d17', function(err, res){
+                                var $ = cheerio.load(res.text);
+                                $('.comment-form').length.should.be.above(0);
+                                $('.comment-form').children('input.comment-author').length.should.be.above(0);
+                                $('.comment-form').children('input.comment-email').length.should.be.above(0);
+                                $('.comment-form').children('textarea.comment-body').length.should.be.above(0);
+                                $('.comment-form').children('input[type="submit"]').length.should.be.above(0);
+                                done();
+                            });
+                    });
+                });
+            }); 
+            describe("POST /post/:permalink/addcomment", function(){
+                it("should return 200 http status after add comment for viewing post", function(done){
+                    importUsersData(function(){
+                        importPostsData(function(){
+                            addCommentToPost(TEST_POST_PERMALINK, 
+                                'anonUser',
+                                'anon@email.com',
+                                'Very nice lorem ipsum post!',
+                                function(err, res){
+                                    should.not.exist(err);
+                                    res.status.should.be.equal(200);
+                                    done();
+                                }
+                            );
+                        });
+                    });
+                });
+                
+                it("should display comment data after adding comment for viewing post", function(done){
+                    importUsersData(function(){
+                        importPostsData(function(){
+                            addCommentToPost(TEST_POST_PERMALINK, 
+                                'anonUser',
+                                'anon@email.com',
+                                'Very nice lorem ipsum post!',
+                                function(err, res){
+                                    should.not.exist(err);
+                                    var $ = cheerio.load(res.text);
+                                    $('.comments-ribbon').children('.post-comment').length.should.equal(1); 
+                                    done();
+                                }
+                            );
+                        });
+                    });
+                });
+                
+                 it("should redirect to view post page after adding comment for viewing post", function(done){
+                    importUsersData(function(){
+                        importPostsData(function(){
+                            addCommentToPost(TEST_POST_PERMALINK, 
+                                'anonUser',
+                                'anon@email.com',
+                                'Very nice lorem ipsum post!',
+                                function(err, res){
+                                    should.not.exist(err);
+                                    res.redirects.should.include(httpRootPath+'/post/'+TEST_POST_PERMALINK+ '/view');
+                                    done();
+                                }
+                            );
+                        });
+                    });
+                });
+            });
+        });
+    });
+    
 });

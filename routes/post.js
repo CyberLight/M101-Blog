@@ -68,3 +68,18 @@ exports.postNewEntry = function(req, res){
         res.redirect('/login');
     }
 }
+
+exports.postNewComment = function(req, res){
+    var permalink = req.params['permalink'],
+        comment = {
+            author : req.body.comment.author,
+            email : req.body.comment.email,
+            body : req.body.comment.body
+        };
+    
+    services.getPostsService(function(err, ps){
+        ps.addCommentToPost(permalink, comment, function(err, countUpdated){
+           res.redirect(301, '/post/'+ permalink + '/view');
+        });
+    });
+};

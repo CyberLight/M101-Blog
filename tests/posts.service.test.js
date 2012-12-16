@@ -21,9 +21,15 @@ var PostsService = require('../lib/services/posts.service').PostsService,
                         body : "Content content content",
                         author : "user1",
                         title : "User1 first post",
-                        tags : "tag1, tag2, tag3"                
+                        tags : "tag1, tag2, tag3"
                     };
-    };
+    },
+    AnonComment1 = {
+        author : 'Anonymous#1',
+        body : 'Very nice post!!!',
+        email : ''
+    },
+    TEST_POST_PERMALINK = '140f01bfd2f126e4d99128a6cf8e5d17';
     
 function importPostsData(cb){
      mDbImport.setDb(DB_NAME)
@@ -177,6 +183,18 @@ The first line of Lorem Ipsum, \"Lorem ipsum dolor sit amet..\", comes from a li
                         should.exist(exit_code);
                         exit_code.should.be.equal(0);
                         done();
+                });
+            });
+        });
+    });
+    
+    describe("Add comments to post by permalink", function(){
+        it("should add comment to post", function(done){
+            importPostsData(function(){
+                postsService.addCommentToPost(TEST_POST_PERMALINK, AnonComment1, function(err, countUpdated){
+                    should.not.exist(err);
+                    countUpdated.should.be.equal(1);
+                    done();
                 });
             });
         });
