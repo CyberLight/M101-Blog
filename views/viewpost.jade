@@ -1,0 +1,18 @@
+extends layout
+
+block content
+  form(method="post")
+    div.postform
+      h1= title
+      div.form-element
+        label
+          | Title:
+        div.post-title-view= post.title
+      div.form-element
+        label
+          | Post content:
+        div.post-body-view=post.body
+      div.form-element
+        label
+          | Tags:        
+        div.post-tags-view= post.stringOfTags

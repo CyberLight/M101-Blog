@@ -22,6 +22,11 @@ will be distracted by the readable content of a page when looking at its layout.
     TestUser = {
          username : 'user1',
          password : 'password1'
+    },
+    TestPost1 = {
+        title : 'My today post title #1',
+        body : 'My today post #1:' + TEST_POST_BODY,
+        tags : 'sun, smile, light'
     };
     
 function importUsersData(cb){
@@ -148,13 +153,40 @@ describe("/post/new page tests", function(){
                          function(err, res){
                             should.not.exist(err);
                             postEntryData(
-                                    'My today post title #1',
-                                    'My today post #1:' + TEST_POST_BODY,
-                                    'sun, smile, light',
+                                    TestPost1.title,
+                                    TestPost1.body,
+                                    TestPost1.tags,
                                     
                                     function(err, res){
                                         res.redirects.should.not.be.empty;
                                         res.redirects[0].should.match(/\/post\/([A-Za-z0-9]+)\/view/i);
+                                        done();
+                                    }
+                            );
+                        });
+                   });
+                });
+            });
+            
+            it("should contain post data after redirects to view post page", function(done){
+                importUsersData(function(){
+                   importPostsData(function(){
+                       login(
+                         TestUser.username,
+                         TestUser.password,
+                         function(err, res){
+                            should.not.exist(err);
+                            postEntryData(
+                                    TestPost1.title,
+                                    TestPost1.body,
+                                    TestPost1.tags,
+                                    
+                                    function(err, res){
+                                        should.not.exist(err);
+                                        var $ = cheerio.load(res.text);
+                                        $('.post-title-view').text().should.be.equal(TestPost1.title.toUpperCase());
+                                        $('.post-body-view').text().should.not.be.empty;
+                                        $('.post-tags-view').text().should.be.equal(TestPost1.tags);
                                         done();
                                     }
                             );
