@@ -122,6 +122,23 @@ describe("/post/new page tests", function(){
                         done();
                      });                     
             });
+            it("should redirect to login page after attempting send new post without login", function(done){
+                 importUsersData(function(){
+                   importPostsData(function(){
+                        postEntryData(
+                            TestPost1.title,
+                            TestPost1.body,
+                            TestPost1.tags,
+                            
+                            function(err, res){
+                                should.not.exist(err);
+                                res.redirects.should.include(httpRootPath+'/login');
+                                done();
+                            }
+                        );
+                   });
+                 });
+            });
         });
         
         describe("For authenticated users", function(){

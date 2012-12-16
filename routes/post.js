@@ -1,9 +1,8 @@
 var services = require('../lib/data/services').services,
-    querystring = require('querystring'),
-    isAuthenticated = false;
+    querystring = require('querystring');
 
-function checkAuthentication(req, res){
-   isAuthenticated = req.signedCookies.username ? true : false;
+function isAuthenticated(req, res){
+   return req.signedCookies.username ? true : false;
 }
 
 function renderNewPostPage(req, res, post){
@@ -22,8 +21,7 @@ function renderViewPostPage(req, res, post){
 }
 
 exports.newEntry = function(req, res){
-    checkAuthentication(req, res);
-    if(!isAuthenticated){
+    if(!isAuthenticated(req,res)){
         res.redirect(301, '/login');
     }else{
         renderNewPostPage(req, res);
@@ -41,29 +39,32 @@ exports.getViewEntry = function(req, res){
     });
 }
 
-exports.postNewEntry = function(req, res){  
-    console.log("POST_NEW_ENTRY");
-    var username = req.signedCookies.username,
-        postEntry = {
-            title : req.body.post.title,
-            body : req.body.post.body,
-            author : username,
-            tags : req.body.post.tags
-        };
-        
-    services.getPostsService(function(err, ps){
-        ps.createEntry(
-            postEntry,
-            function(err, posts){
-                console.log(err);
-                if(err){
-                   renderNewPostPage(req, res, postEntry);
-                }else{
-                   console.log(posts[0].permalink);
-                   var redirectUrl = '/post/' + posts[0].permalink + '/view';                   
-                   res.redirect(redirectUrl);
+exports.postNewEntry = function(req, res){
+    if(isAuthenticated(req,res)){
+        var username = req.signedCookies.username,
+            postEntry = {
+                title : req.body.post.title,
+                body : req.body.post.body,
+                author : username,
+                tags : req.body.post.tags
+            };
+            
+        services.getPostsService(function(err, ps){
+            ps.createEntry(
+                postEntry,
+                function(err, posts){
+                    console.log(err);
+                    if(err){
+                       renderNewPostPage(req, res, postEntry);
+                    }else{
+                       console.log(posts[0].permalink);
+                       var redirectUrl = '/post/' + posts[0].permalink + '/view';
+                       res.redirect(redirectUrl);
+                    }
                 }
-            }
-        );
-    });
+            );
+        });
+    }else{
+        res.redirect('/login');
+    }
 }
