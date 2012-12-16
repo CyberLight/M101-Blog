@@ -121,21 +121,22 @@ describe("posts service tests", function(){
         
         
         it("should create post with setting date field using current date and time", function(done){
-            importPostsData(function(){                        
+            importPostsData(function(){
                 postsService.createEntry(getPostEntry1(), function(err, posts){
                     should.not.exist(err);
                     var validPermalink = hashMgr.getHash(getPostEntry1().title),
-                        post = posts[0];
+                        post = posts[0],
+                        curdate = new Date();
                     
-                    post.date.getDate().should.be.equal(15);
-                    post.date.getYear().should.be.equal(112);
-                    post.date.getMonth().should.be.equal(11);                    
+                    post.date.getDate().should.be.equal(curdate.getDate());
+                    post.date.getYear().should.be.equal(curdate.getYear());
+                    post.date.getMonth().should.be.equal(curdate.getMonth());
                     done();
                 });
             });
         });
         
-        it("should create post with unescaped title", function(done){   
+        it("should create post with unescaped title", function(done){
             importPostsData(function(){
                 postsService.createEntry(getPostEntry1(), function(err, posts){
                     should.not.exist(err);
@@ -169,15 +170,15 @@ The first line of Lorem Ipsum, \"Lorem ipsum dolor sit amet..\", comes from a li
                                 tags : "tag" +(i+1)+ ", tag" + (i+2) + ", tag" + (i+3)
                               };
                     postsService.createEntry(post, function (){
-                        console.log('.');                   
+                        console.log('.');
                     });
                 }      
                 mDbExport.setDb(DB_NAME).setCollection(COL_POSTS).exportData(".\\tests_outdir\\posts.json",function(exit_code){
                         should.exist(exit_code);
                         exit_code.should.be.equal(0);
                         done();
-                });                
+                });
             });
         });
-    });    
+    });
 });

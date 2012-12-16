@@ -7,14 +7,14 @@ block content
       div.form-element
         label
           | Title:
-        input.post-title(type="text")
+        input.post-title(type="text", name="post[title]", value=post.title)
       div.form-element
         label
           | Post content:
-        textarea(cols="120", rows="20")
+        textarea(cols="120", rows="20", name="post[body]", value=post.body)
       div.form-element
         label
           | Tags:
         span Comma separated, please
-        input.post-tags(type="text")
+        input.post-tags(type="text", name="post[tags]", value=post.tags)
       input(type="submit")
