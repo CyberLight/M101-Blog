@@ -121,6 +121,17 @@ function addCommentToPost(permalink, authorv, emailv, bodyv, cb){
                      .end(cb);
 }
 
+function addCommentToPostForLoggedInUser(permalink, bodyv, cb){
+     agent.post(httpRootPath+'/post/' + permalink + '/addcomment')
+                     .type('form')
+                     .send({ comment : 
+                                {                                     
+                                    body : bodyv
+                                }
+                           })
+                     .end(cb);
+}
+
 describe("/post/new page tests", function(){
     
     describe("GET /post/new", function(){
@@ -238,11 +249,65 @@ describe("/post/new page tests", function(){
     });
     
     describe("Comments for post", function(){
+        describe("for logged in user", function(){
+            it("should display only comment's body textbox for adding comment", function(done){
+                importUsersData(function(){
+                   importPostsData(function(){
+                       login(
+                         TestUser.username,
+                         TestUser.password,
+                         function(err, res){
+                            should.not.exist(err);
+                            goToViewPostByPermalink(TEST_POST_PERMALINK, function(err, res){
+                                var $ = cheerio.load(res.text);
+                                $('.comment-form').length.should.be.above(0);
+                                $('.comment-form').children('input.comment-author').length.should.be.equal(0);
+                                $('.comment-form').children('input.comment-email').length.should.be.equal(0);
+                                $('.comment-form').children('textarea.comment-body').length.should.be.above(0);
+                                $('.comment-form').children('input[type="submit"]').length.should.be.above(0);
+                                done();
+                            });
+                         }
+                       )
+                   });
+                });
+            });
+            
+            it("should display adding comment without filling author and email for post", function(done){
+                importUsersData(function(){
+                   importPostsData(function(){
+                       login(
+                         TestUser.username,
+                         TestUser.password,
+                         function(err, res){
+                            should.not.exist(err);
+                            addCommentToPostForLoggedInUser(
+                                        TEST_POST_PERMALINK,
+                                        'Logged in user1 comment to this post',
+                                        function(err, res){
+                                            should.not.exist(err);
+                                            var $ = cheerio.load(res.text),
+                                                firstComment = null,
+                                                author=null;
+                                            $('.comments-ribbon').children('.post-comment').length.should.be.above(0);
+                                            firstComment = $('.comments-ribbon').children('.post-comment')[0];
+                                            author = $(firstComment).children('.author');
+                                            $(author).text().should.be.equal(' user1');
+                                            done();
+                                        });
+                         }
+                       )
+                   });
+                });
+            })
+        });
+        
         describe("for anonymous user", function(){
             it("should display region for adding comment", function(done){
                 importUsersData(function(){
                     importPostsData(function(){
-                            goToViewPostByPermalink('140f01bfd2f126e4d99128a6cf8e5d17', function(err, res){
+                        logout(function(){
+                            goToViewPostByPermalink(TEST_POST_PERMALINK, function(err, res){
                                 var $ = cheerio.load(res.text);
                                 $('.comment-form').length.should.be.above(0);
                                 $('.comment-form').children('input.comment-author').length.should.be.above(0);
@@ -251,6 +316,7 @@ describe("/post/new page tests", function(){
                                 $('.comment-form').children('input[type="submit"]').length.should.be.above(0);
                                 done();
                             });
+                        });
                     });
                 });
             }); 

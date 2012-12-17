@@ -17,7 +17,7 @@ function renderViewPostPage(req, res, post){
     post.title = querystring.unescape(post.title).toUpperCase();
     post.stringOfTags = tagsJoined;
     
-    res.render('viewpost', { title : "View post page", post : postEntity});
+    res.render('viewpost', { title : "View post page", post : postEntity, isAuthenticated : isAuthenticated(req, res)});
 }
 
 exports.newEntry = function(req, res){
@@ -71,15 +71,24 @@ exports.postNewEntry = function(req, res){
 
 exports.postNewComment = function(req, res){
     var permalink = req.params['permalink'],
+        comment = null;
+        
+    if(isAuthenticated(req, res)){
+        comment = {
+            author : req.signedCookies.username,            
+            body : req.body.comment.body
+        };
+    }else{
         comment = {
             author : req.body.comment.author,
             email : req.body.comment.email,
             body : req.body.comment.body
         };
+    }
     
     services.getPostsService(function(err, ps){
         ps.addCommentToPost(permalink, comment, function(err, countUpdated){
            res.redirect(301, '/post/'+ permalink + '/view');
         });
-    });
+    });    
 };

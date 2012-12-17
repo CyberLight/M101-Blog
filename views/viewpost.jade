@@ -14,14 +14,15 @@ block content
         div.post-tags-view= post.stringOfTags
       form(action="/post/"+post.permalink+"/addcomment", method="post")
           div.comment-form
-            div.form-element
-              label
-               | author:
-              input.comment-author(type="text", name='comment[author]')
-            div.form-element
-              label
-               | e-mail:
-              input.comment-email(type="email", name="comment[email]")
+            -if(!isAuthenticated)
+                div.form-element
+                  label
+                   | author:
+                  input.comment-author(type="text", name='comment[author]')
+                div.form-element
+                  label
+                   | e-mail:
+                  input.comment-email(type="email", name="comment[email]")
             div.form-element
               label
                | comment:
