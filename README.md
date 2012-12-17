@@ -23,6 +23,16 @@ M101-Blog
 * **Node.js** - v 0.8.15 or later
 * **MongoDB** - v 2.2.1 or later
 
+## Instructions
+
+* Requires installing node.js
+
+* After cloning project from repository run `npm install` command which download project dependencies from `npmjs.org`
+
+* For running all tests you can use `run-tests.bat test` ( for Windows users only at current time ).
+    * For successfull passing all tests requires running MongoDB daemon instance (or you must run it in console, manually before running all tests).
+    * In process of running tests, all data manipulations occur in a database called **M101Test**
+
 ## Information
 * This blog created using **Test Driven Development** technology and at current time was wrote **109** tests
 
@@ -32,6 +42,7 @@ M101-Blog
 * **superagent** - very cool tool for creating different http queries fo testing purposes
 * **mocha** - very cool test runner using different notation and very easy to use
 * **secure_random** - provide generating real random numbers
+* **express** - very powerful tool for creating web applications based on node.js
 
 ## Created tools
 * In process of development  this blog i created following tools:
@@ -65,14 +76,6 @@ var MdbUnit = require("../lib/utils/database/mdb.unit").MdbUnit,
                         done();
                 });
 ```
-## Instructions
-
-* Requires installing node.js
-
-* For running all tests you can use `run-tests.bat test` ( for Windows users only at current time ).
-    * For successfull passing all tests requires running MongoDB daemon instance (or you must run it in console, manually before running all tests).
-    * In process of running tests, all data manipulations occur in a database called **M101Test**
-
     
 ## TODOs
 
