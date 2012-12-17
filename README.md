@@ -69,7 +69,7 @@ mDbImport
 
 ```javascript
 var MdbUnit = require("../lib/utils/database/mdb.unit").MdbUnit,
-    mDbExport = new MdbUnit.Import();
+    mDbExport = new MdbUnit.Export();
  mDbExport.setDb(DB_NAME).setCollection(COL_POSTS).exportData(".\\tests_outdir\\posts.json",function(exit_code){
                         should.exist(exit_code);
                         exit_code.should.be.equal(0);
