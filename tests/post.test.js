@@ -28,7 +28,8 @@ will be distracted by the readable content of a page when looking at its layout.
         body : 'My today post #1:' + TEST_POST_BODY,
         tags : 'sun, smile, light'
     },
-    TEST_POST_PERMALINK = '140f01bfd2f126e4d99128a6cf8e5d17';
+    TEST_POST_PERMALINK = '140f01bfd2f126e4d99128a6cf8e5d17',
+    EMPTY_STR_VALUE = '';
     
 function importUsersData(cb){
      mDbImport.setDb(DB_NAME).setCollection(COL_USERS).setDrop(true).importData("tests\\importData\\users.json", function(code){
@@ -366,6 +367,42 @@ describe("/post/new page tests", function(){
                                 function(err, res){
                                     should.not.exist(err);
                                     res.redirects.should.include(httpRootPath+'/post/'+TEST_POST_PERMALINK+ '/view');
+                                    done();
+                                }
+                            );
+                        });
+                    });
+                });
+                
+               it("should not redirect to view post data after trying add comment with empty author and body fields", function(done){
+                    importUsersData(function(){
+                        importPostsData(function(){
+                            addCommentToPost(TEST_POST_PERMALINK, 
+                                EMPTY_STR_VALUE,
+                                EMPTY_STR_VALUE,
+                                EMPTY_STR_VALUE,
+                                function(err, res){
+                                    should.not.exist(err);
+                                    res.redirects.should.be.empty;
+                                    done();
+                                }
+                            );
+                        });
+                    });
+                });
+                
+                it("should show error information after trying add comment without filling author and body fields", function(done){
+                    importUsersData(function(){
+                        importPostsData(function(){
+                            addCommentToPost(TEST_POST_PERMALINK, 
+                                EMPTY_STR_VALUE,
+                                EMPTY_STR_VALUE,
+                                EMPTY_STR_VALUE,
+                                function(err, res){
+                                    should.not.exist(err);
+                                    var $ = cheerio.load(res.text);
+                                    $('div#comment-author-error').text().should.be.equal("invalid author of comment");
+                                    $('div#comment-body-error').text().should.be.equal("invalid body of comment");
                                     done();
                                 }
                             );

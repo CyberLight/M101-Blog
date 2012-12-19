@@ -1,5 +1,9 @@
 var services = require('../lib/data/services').services,
-    querystring = require('querystring');
+    querystring = require('querystring'),
+    EMPTY_ERRORS = {"comment-author-error" : "", 
+                   "comment-email-error" : "",
+                   "comment-body-error" : "",
+                   "success" : true };
 
 function isAuthenticated(req, res){
    return req.signedCookies.username ? true : false;
@@ -10,14 +14,64 @@ function renderNewPostPage(req, res, post){
     res.render('newpost', { title : "Create a new post", post : postEntity});
 }
 
-function renderViewPostPage(req, res, post){
+function renderViewPostPage(req, res, post, formCommentv){
     var postEntity = post || { title : 'empty title', body : 'empty body', tags : [] },
-        tagsJoined = post.tags.length ? post.tags.join(', ') : '';
-    
+        tagsJoined = post.tags.length ? post.tags.join(', ') : '',
+        formComment = formCommentv || { author : '', email : '', body : '', errors : EMPTY_ERRORS };  
     post.title = querystring.unescape(post.title).toUpperCase();
     post.stringOfTags = tagsJoined;
     
-    res.render('viewpost', { title : "View post page", post : postEntity, isAuthenticated : isAuthenticated(req, res)});
+    res.render('viewpost', { title : "View post page", post : postEntity, isAuthenticated : isAuthenticated(req, res), comment : formComment });
+}
+
+function renderPostViewWithCommentForm(req, res, comment){
+     services.getPostsService(function(err, ps){
+        ps.getByPermalink(req.params['permalink'], 
+            function(err, post){
+                renderViewPostPage(req, res, post, comment);
+            }
+        );
+    });
+}
+
+function validateComment(comment){
+    var validationRules = [],
+        validationResult = [];
+    
+    validationRules.push(function(data){
+        var result = {};
+        result["success"] = new RegExp(/^[a-zA-Z0-9_-]{3,20}$/i).test(data.author);
+        result["error"] = !result.success ? "invalid author of comment" : "";
+        result["type"] = "comment-author-error";
+        return result; 
+    });
+    
+    validationRules.push(function(data){
+        var result = {};
+        result["success"] = new RegExp(/^[\w\s\S]{2,255}$/ig).test(data.body);
+        result["error"] = !result.success ? "invalid body of comment" : "";
+        result["type"] = "comment-body-error";
+        return result; 
+    })
+    
+    validationRules.push(function(data){
+        var result = {};
+        result["success"] = !data.email || new RegExp(/^[\S]+@[\S]+\.[\S]+$/i).test(data.email);
+        result["error"] = !result.success ? "invalid email address" : "";
+        result["type"] = "comment-email-error";
+        return result; 
+    })
+    
+    var success = true;
+        
+    for(var i=0, len=validationRules.length; i<len; i++){
+        var result = validationRules[i](comment);
+        validationResult[result.type] = result.error;
+        success &= result.success;
+    }    
+    
+    validationResult["success"] = success;
+    return validationResult;
 }
 
 exports.newEntry = function(req, res){
@@ -30,13 +84,7 @@ exports.newEntry = function(req, res){
 }
 
 exports.getViewEntry = function(req, res){
-     services.getPostsService(function(err, ps){
-        ps.getByPermalink(req.params['permalink'], 
-            function(err, post){
-                renderViewPostPage(req, res, post);
-            }
-        );
-    });
+    renderPostViewWithCommentForm(req, res);
 }
 
 exports.postNewEntry = function(req, res){
@@ -71,11 +119,12 @@ exports.postNewEntry = function(req, res){
 
 exports.postNewComment = function(req, res){
     var permalink = req.params['permalink'],
-        comment = null;
+        comment = null,
+        validationResult = null;
         
     if(isAuthenticated(req, res)){
         comment = {
-            author : req.signedCookies.username,            
+            author : req.signedCookies.username,
             body : req.body.comment.body
         };
     }else{
@@ -86,9 +135,17 @@ exports.postNewComment = function(req, res){
         };
     }
     
-    services.getPostsService(function(err, ps){
-        ps.addCommentToPost(permalink, comment, function(err, countUpdated){
-           res.redirect(301, '/post/'+ permalink + '/view');
+    validationResult = validateComment(comment);
+    
+    if(!validationResult.success){
+        comment.errors = validationResult;
+        renderPostViewWithCommentForm(req, res, comment);
+    }else{
+        comment.errors = EMPTY_ERRORS;
+        services.getPostsService(function(err, ps){
+            ps.addCommentToPost(permalink, comment, function(err, countUpdated){
+               res.redirect(301, '/post/'+ permalink + '/view');
+            });
         });
-    });    
+    }
 };

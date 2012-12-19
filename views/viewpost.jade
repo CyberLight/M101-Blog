@@ -18,15 +18,21 @@ block content
                 div.form-element
                   label
                    | author:
-                  input.comment-author(type="text", name='comment[author]')
+                  input.comment-author(type="text", name='comment[author]', value=comment.author)
+                  -if(comment.errors["comment-author-error"])
+                    div#comment-author-error.error= comment.errors["comment-author-error"]
                 div.form-element
                   label
                    | e-mail:
-                  input.comment-email(type="email", name="comment[email]")
+                  input.comment-email(type="email", name="comment[email]", value=comment.email)
+                  -if(comment.errors["comment-email-error"])
+                    div#comment-email-error.error= comment.errors["comment-email-error"]
             div.form-element
               label
                | comment:
-              textarea.comment-body(cols="67", rows="7", name="comment[body]")
+              textarea.comment-body(cols="67", rows="7", name="comment[body]", value=comment.body)
+              -if(comment.errors["comment-body-error"])
+                    div#comment-body-error.error= comment.errors["comment-body-error"]
             input(type="submit", value="Add comment")
       div.comments-ribbon
         h4 Comments:
