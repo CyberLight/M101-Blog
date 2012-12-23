@@ -13,7 +13,7 @@ block content
           | Tags:
         div.post-tags-view= post.stringOfTags
       form(action="/post/"+post.permalink+"/addcomment", method="post")
-          div.comment-form
+          div.comment-form            
             -if(!isAuthenticated)
                 div.form-element
                   label
@@ -39,6 +39,12 @@ block content
         -if(post.comments)
           each comment in post.comments
             section.post-comment
+              div.comment-like
+                div.like.icon(data-token=comment.token) Ã
+                -if(comment.likes)
+                  div.like-info= comment.likes
+                -else
+                  div.like-info= "0"
               label author: 
               span.author= ' ' + comment.author
               section.content= comment.body

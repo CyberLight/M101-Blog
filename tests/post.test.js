@@ -250,6 +250,45 @@ describe("/post/new page tests", function(){
     });
     
     describe("Comments for post", function(){
+        describe("like system for all users", function(){
+            it("should show \"like\" button for comment", function(done){
+                importUsersData(function(){
+                   importPostsData(function(){
+                        addCommentToPost(TEST_POST_PERMALINK, 
+                                    'anonym', 
+                                    EMPTY_STR_VALUE, 
+                                    'comment from anonym',
+                                    function(err, res){
+                                        var $ = cheerio.load(res.text);
+                                        var commentLike = $('.comment-like');
+                                        commentLike.length.should.be.equal(1);
+                                        $(commentLike).children('.like').text().should.be.equal("Ã");
+                                        $(commentLike).children('.like-info').text().should.be.equal("0");
+                                        done();
+                                    }
+                        );
+                    });
+                });
+            });
+            
+            it("should include token with len greater than 36 symbols for \"like\" button of comment", function(done){
+                importUsersData(function(){
+                   importPostsData(function(){
+                        addCommentToPost(TEST_POST_PERMALINK, 
+                                    'anonym', 
+                                    EMPTY_STR_VALUE, 
+                                    'comment from anonym',
+                                    function(err, res){
+                                        var $ = cheerio.load(res.text),
+                                            dataToken = $('.like').attr('data-token');
+                                        dataToken.length.should.be.above(36);
+                                        done();
+                                    }
+                        );
+                    });
+                });
+            });
+        });
         describe("for logged in user", function(){
             it("should display only comment's body textbox for adding comment", function(done){
                 importUsersData(function(){

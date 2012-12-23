@@ -1,5 +1,6 @@
 var services = require('../lib/data/services').services,
     querystring = require('querystring'),
+    Utils = require('../lib/utils/utils').Utils;
     EMPTY_ERRORS = {"comment-author-error" : "", 
                    "comment-email-error" : "",
                    "comment-body-error" : "",
@@ -20,7 +21,10 @@ function renderViewPostPage(req, res, post, formCommentv){
         formComment = formCommentv || { author : '', email : '', body : '', errors : EMPTY_ERRORS };  
     post.title = querystring.unescape(post.title).toUpperCase();
     post.stringOfTags = tagsJoined;
-    
+    post.comments.forEach(function(comment, index){
+        if(!comment.token)
+            comment.token = Utils.genGuid('') + index;
+    });
     res.render('viewpost', { title : "View post page", post : postEntity, isAuthenticated : isAuthenticated(req, res), comment : formComment });
 }
 

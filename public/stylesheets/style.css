@@ -192,6 +192,51 @@ a {
 .comments-ribbon .post-comment {
   border-bottom: solid 1px lightgray;
 }
+.comments-ribbon .post-comment .like,
+.comments-ribbon .post-comment .like-info {
+  float: left;
+}
+.comments-ribbon .post-comment .like-info {
+  margin-left: 2px;
+  border-left: solid 1px #ccc;
+  line-height: 28px;
+  padding: 0 10px 0 10px;
+  text-align: center;
+  color: black;
+}
+.comments-ribbon .post-comment .like {
+  color: red;
+  line-height: 17px;
+  font-size: 30px;
+  padding: 5px;
+}
+.comments-ribbon .post-comment .like:hover {
+  color: white;
+  -webkit-box-shadow: inset 0 1px #EC705F;
+  -moz-box-shadow: inset 0 1px #ec705f;
+  box-shadow: inset 0 1px #EC705F;
+  background-color: #D14228;
+  background-image: -webkit-linear-gradient(top, #d94f31, #d14228);
+  background-image: -moz-linear-gradient(top, #d94f31, #d14228);
+  background-image: -ms-linear-gradient(top, #d94f31, #d14228);
+  background-image: -o-linear-gradient(top, #d94f31, #d14228);
+  background-image: linear-gradient(top, #d94f31, #d14228);
+  border: 1px solid #832014;
+  border-radius: 3px;
+  -webkit-border-radius: 3px;
+  -moz-border-radius: 3px;
+}
+.comments-ribbon .post-comment .comment-like {
+  float: right;
+  font-size: 12px;
+  font-weight: bold;
+  padding: 1px;
+  border: solid 1px #CCC;
+  border-radius: 5px;
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  cursor: pointer;
+}
 .comments-ribbon .post-comment label {
   font-weight: normal;
   font-style: italic;
