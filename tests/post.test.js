@@ -409,6 +409,26 @@ describe("/post/new page tests", function(){
                         });
                     });
                 });
+                
+                it("should show error information after trying add comment with wrong email, author and body fields", function(done){
+                    importUsersData(function(){
+                        importPostsData(function(){
+                            addCommentToPost(TEST_POST_PERMALINK, 
+                                EMPTY_STR_VALUE,
+                                "@info.com",
+                                EMPTY_STR_VALUE,
+                                function(err, res){
+                                    should.not.exist(err);
+                                    var $ = cheerio.load(res.text);
+                                    $('div#comment-author-error').text().should.be.equal("invalid author of comment");
+                                    $('div#comment-email-error').text().should.be.equal("invalid email address");
+                                    $('div#comment-body-error').text().should.be.equal("invalid body of comment");
+                                    done();
+                                }
+                            );
+                        });
+                    });
+                });
             });
         });
     });
