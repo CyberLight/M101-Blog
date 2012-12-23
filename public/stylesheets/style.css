@@ -191,6 +191,7 @@ a {
 }
 .comments-ribbon .post-comment {
   border-bottom: solid 1px lightgray;
+  padding-top: 10px;
 }
 .comments-ribbon .post-comment .like,
 .comments-ribbon .post-comment .like-info {

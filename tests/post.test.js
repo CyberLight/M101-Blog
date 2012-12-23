@@ -4,6 +4,7 @@ var mocha = require('../node_modules/mocha'),
 	superagent = require("../node_modules/superagent"),
 	testUtils = require("../lib/shared/test.utils"),
     MdbUnit = require("../lib/utils/database/mdb.unit").MdbUnit,
+    Utils = require("../lib/utils/utils").Utils,
     mDbImport = new MdbUnit.Import(),
 	cheerio = require('../node_modules/cheerio'),	
 	agent = superagent.agent(),
@@ -117,6 +118,17 @@ function addCommentToPost(permalink, authorv, emailv, bodyv, cb){
                                     author : authorv,
                                     email : emailv,
                                     body : bodyv
+                                }
+                           })
+                     .end(cb);
+}
+
+function addLikeToPostComment(permalink, token, cb){
+     agent.post(httpRootPath+'/post/' + permalink + '/addlike')
+                     .type('form')
+                     .send({ like : 
+                                { 
+                                    token : token
                                 }
                            })
                      .end(cb);
@@ -285,6 +297,56 @@ describe("/post/new page tests", function(){
                                         done();
                                     }
                         );
+                    });
+                });
+            });
+            
+            it("should include permalink for \"like\" button of comment", function(done){
+                importUsersData(function(){
+                   importPostsData(function(){
+                        addCommentToPost(TEST_POST_PERMALINK, 
+                                    'anonym', 
+                                    EMPTY_STR_VALUE, 
+                                    'comment from anonym',
+                                    function(err, res){
+                                        var $ = cheerio.load(res.text),
+                                            postPermalink = $('.like').attr('data-plink');
+                                        postPermalink.should.be.equal(TEST_POST_PERMALINK);
+                                        done();
+                                    }
+                        );
+                    });
+                });
+            });
+            describe('POST /post/:permalink/addlike', function(){
+                it("should return 200 http status when try like the comment", function(done){
+                    importUsersData(function(){
+                       importPostsData(function(){
+                            var commentOrginal = 0;
+                            addLikeToPostComment(TEST_POST_PERMALINK,
+                                                 Utils.genGuid()+ commentOrginal,
+                                                 function(err, res){
+                                                    should.not.exists(err);
+                                                    res.status.should.be.equal(200);
+                                                    done();
+                                                 });
+                       });
+                    });
+                });
+                
+                it("should return json response object with fields after posting \"like\" for comment", function(done){
+                    importUsersData(function(){
+                       importPostsData(function(){
+                            var commentOrginal = 0;
+                            addLikeToPostComment(TEST_POST_PERMALINK,
+                                                 Utils.genGuid()+ commentOrginal,
+                                                 function(err, res){
+                                                    should.not.exists(err);
+                                                    res.body.hasOwnProperty('success').should.be.ok;
+                                                    res.body.hasOwnProperty('likes').should.be.ok;
+                                                    done();
+                                                 });
+                       });
                     });
                 });
             });

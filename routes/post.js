@@ -153,3 +153,9 @@ exports.postNewComment = function(req, res){
         });
     }
 };
+
+exports.postAddLike = function(req, res){
+    var permalink = req.params['permalink'],
+        token = req.body.token;
+    res.json({success : true, likes : 0});
+}

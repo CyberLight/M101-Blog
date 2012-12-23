@@ -3,7 +3,7 @@ extends layout
 block content
     div.postform
       a.icon.goback(href="/") <
-      h1.post-title-view= post.title      
+      h1.post-title-view= post.title
       div.form-element
         label
           | Post content:
@@ -13,7 +13,7 @@ block content
           | Tags:
         div.post-tags-view= post.stringOfTags
       form(action="/post/"+post.permalink+"/addcomment", method="post")
-          div.comment-form            
+          div.comment-form
             -if(!isAuthenticated)
                 div.form-element
                   label
@@ -40,7 +40,7 @@ block content
           each comment in post.comments
             section.post-comment
               div.comment-like
-                div.like.icon(data-token=comment.token) Ã
+                div.like.icon(data-token=comment.token, data-plink=post.permalink) Ã
                 -if(comment.likes)
                   div.like-info= comment.likes
                 -else
@@ -48,3 +48,4 @@ block content
               label author: 
               span.author= ' ' + comment.author
               section.content= comment.body
+    script(src="/javascripts/app/viewpost-page.js")
