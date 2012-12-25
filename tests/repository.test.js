@@ -125,6 +125,16 @@ describe("Repository object", function(){
                     });
                 });
             });
+            it("should modify user and return data", function(done){
+                importUsersData(function(){
+                    repository.findAndModify({'_id' : "user4"}, [], {$set : {password : 'changed'}}, {new : true}, function(err, doc){
+                        logError(err);
+                        should.not.exist(err);
+                        doc.password.should.be.equal('changed');
+                        done();
+                    });
+                });
+            });
 		});
 	});
 });

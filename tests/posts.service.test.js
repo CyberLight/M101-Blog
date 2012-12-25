@@ -15,7 +15,7 @@ var PostsService = require('../lib/services/posts.service').PostsService,
     postsService = null,
     hashMgr = new HashMgr('md5'),
     querystring = require('querystring'),
-    TEST_POST_PERMALINK = 'f24bb941e34cff2fda983b56db603425',
+    TEST_POST_PERMALINK_WITH_COMMENT = 'f24bb941e34cff2fda983b56db603425',    
     getPostEntry1 = function(){
             return  {
                         body : "Content content content",
@@ -196,6 +196,24 @@ The first line of Lorem Ipsum, \"Lorem ipsum dolor sit amet..\", comes from a li
                     countUpdated.should.be.equal(1);
                     done();
                 });
+            });
+        });
+    });
+    
+    describe("Add like to comment by permalink and ordinal", function(){
+        it("should add \"like\" to comment and get count of likes", function(done){
+            importPostsData(function(){
+                var COMMENT_ORDINAL = 0;
+                postsService.addLikeToComment(
+                    TEST_POST_PERMALINK_WITH_COMMENT, 
+                    COMMENT_ORDINAL,
+                    
+                    function(err, likes){
+                        should.not.exist(err);
+                        likes.should.be.equal(1);
+                        done();
+                    }
+                );
             });
         });
     });

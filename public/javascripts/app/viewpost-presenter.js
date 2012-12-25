@@ -7,6 +7,7 @@ define('viewpost',
             registerHandlers = function(){
                 $('.like').click(function(e){
                     var likeDiv = e.target,
+                        likeInfo = $(likeDiv).parent().children('.like-info'),
                         permalink = $(likeDiv).attr('data-plink'),
                         token = $(likeDiv).attr('data-token'),
                         like = { token : token };
@@ -14,9 +15,12 @@ define('viewpost',
                     $.ajax({
                         type: 'POST',
                         url: '/post/'+permalink+'/addlike',
-                        data : like                        
+                        data : like
                     }).done(function(data){
-                        
+                        var likes = 0
+                        if(data.success)
+                            likes = data.likes;
+                        $(likeInfo).text(data.likes);
                     });
                 });
             };

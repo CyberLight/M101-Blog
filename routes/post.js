@@ -156,6 +156,17 @@ exports.postNewComment = function(req, res){
 
 exports.postAddLike = function(req, res){
     var permalink = req.params['permalink'],
-        token = req.body.token;
-    res.json({success : true, likes : 0});
+        token = req.body.token,
+        response = {success : true, likes : 0},
+        ordinal = token.substring(36);
+        
+    services.getPostsService(function(err, ps){
+        ps.addLikeToComment(permalink, ordinal, function(err, likes){
+        
+            response.success = !err;
+            response.likes = likes || 0;
+            
+            res.json(response);
+        });
+    });
 }

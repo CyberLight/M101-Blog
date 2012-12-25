@@ -30,6 +30,7 @@ will be distracted by the readable content of a page when looking at its layout.
         tags : 'sun, smile, light'
     },
     TEST_POST_PERMALINK = '140f01bfd2f126e4d99128a6cf8e5d17',
+    TEST_POST_PERMALINK_WITH_COMMENTS = 'f24bb941e34cff2fda983b56db603425',
     EMPTY_STR_VALUE = '';
     
 function importUsersData(cb){
@@ -126,10 +127,8 @@ function addCommentToPost(permalink, authorv, emailv, bodyv, cb){
 function addLikeToPostComment(permalink, token, cb){
      agent.post(httpRootPath+'/post/' + permalink + '/addlike')
                      .type('form')
-                     .send({ like : 
-                                { 
-                                    token : token
-                                }
+                     .send({
+                             token : token
                            })
                      .end(cb);
 }
@@ -322,9 +321,11 @@ describe("/post/new page tests", function(){
                 it("should return 200 http status when try like the comment", function(done){
                     importUsersData(function(){
                        importPostsData(function(){
-                            var commentOrginal = 0;
-                            addLikeToPostComment(TEST_POST_PERMALINK,
-                                                 Utils.genGuid()+ commentOrginal,
+                            var commentOrdinal = '0',
+                                guid = Utils.genGuid();
+                                
+                            addLikeToPostComment(TEST_POST_PERMALINK_WITH_COMMENTS,
+                                                 guid + commentOrdinal,
                                                  function(err, res){
                                                     should.not.exists(err);
                                                     res.status.should.be.equal(200);
@@ -337,9 +338,11 @@ describe("/post/new page tests", function(){
                 it("should return json response object with fields after posting \"like\" for comment", function(done){
                     importUsersData(function(){
                        importPostsData(function(){
-                            var commentOrginal = 0;
-                            addLikeToPostComment(TEST_POST_PERMALINK,
-                                                 Utils.genGuid()+ commentOrginal,
+                            var commentOrdinal = '0',
+                                guid = Utils.genGuid();
+                                
+                            addLikeToPostComment(TEST_POST_PERMALINK_WITH_COMMENTS,
+                                                 guid + commentOrdinal,
                                                  function(err, res){
                                                     should.not.exists(err);
                                                     res.body.hasOwnProperty('success').should.be.ok;
@@ -349,6 +352,24 @@ describe("/post/new page tests", function(){
                        });
                     });
                 });
+                
+                 it("should return json response object with count of likes after posting \"like\" for comment", function(done){
+                    importUsersData(function(){
+                       importPostsData(function(){
+                            var commentOrdinal = '0',
+                                guid = Utils.genGuid();                            
+                                
+                            addLikeToPostComment(TEST_POST_PERMALINK_WITH_COMMENTS,
+                                                guid + commentOrdinal,
+                                                 function(err, res){
+                                                    should.not.exists(err);
+                                                    res.body.success.should.be.ok;
+                                                    res.body.likes.should.be.equal(1);
+                                                    done();
+                                                 });
+                       });
+                    });
+                });                
             });
         });
         describe("for logged in user", function(){
