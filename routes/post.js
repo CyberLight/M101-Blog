@@ -15,6 +15,12 @@ function renderNewPostPage(req, res, post){
     res.render('newpost', { title : "Create a new post", post : postEntity});
 }
 
+function getToken(index){
+    var strMillisec = new Date().getTime().toString(),
+        tokenValue = Utils.format("{0}-{1}", strMillisec, index);
+    return Utils.toBase64(tokenValue);
+}
+
 function renderViewPostPage(req, res, post, formCommentv){
     var postEntity = post || { title : 'empty title', body : 'empty body', tags : [] },
         tagsJoined = post.tags.length ? post.tags.join(', ') : '',
@@ -22,8 +28,9 @@ function renderViewPostPage(req, res, post, formCommentv){
     post.title = querystring.unescape(post.title).toUpperCase();
     post.stringOfTags = tagsJoined;
     post.comments.forEach(function(comment, index){
-        if(!comment.token)
-            comment.token = Utils.genGuid('') + index;
+        if(!comment.token){
+            comment.token = getToken(index);
+        }
     });
     res.render('viewpost', { title : "View post page", post : postEntity, isAuthenticated : isAuthenticated(req, res), comment : formComment });
 }
@@ -147,6 +154,7 @@ exports.postNewComment = function(req, res){
     }else{
         comment.errors = EMPTY_ERRORS;
         services.getPostsService(function(err, ps){
+            delete comment.errors;
             ps.addCommentToPost(permalink, comment, function(err, countUpdated){
                res.redirect(301, '/post/'+ permalink + '/view');
             });
@@ -158,7 +166,7 @@ exports.postAddLike = function(req, res){
     var permalink = req.params['permalink'],
         token = req.body.token,
         response = {success : true, likes : 0},
-        ordinal = token.substring(36);
+        ordinal = Utils.fromBase64(token).match(/-(\d+)$/i)[1];
         
     services.getPostsService(function(err, ps){
         ps.addLikeToComment(permalink, ordinal, function(err, likes){

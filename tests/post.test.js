@@ -31,7 +31,12 @@ will be distracted by the readable content of a page when looking at its layout.
     },
     TEST_POST_PERMALINK = '140f01bfd2f126e4d99128a6cf8e5d17',
     TEST_POST_PERMALINK_WITH_COMMENTS = 'f24bb941e34cff2fda983b56db603425',
-    EMPTY_STR_VALUE = '';
+    EMPTY_STR_VALUE = '',
+    AnonymousUser = {
+        author : 'anonUser',
+        email : 'anon@email.com',
+        body : 'Very nice lorem ipsum post!'
+    };
     
 function importUsersData(cb){
      mDbImport.setDb(DB_NAME).setCollection(COL_USERS).setDrop(true).importData("tests\\importData\\users.json", function(code){
@@ -282,7 +287,7 @@ describe("/post/new page tests", function(){
                 });
             });
             
-            it("should include token with len greater than 36 symbols for \"like\" button of comment", function(done){
+            it("should include token in base64 format with encoded milliseconds of datetime and ordinal for \"like\" button of comment", function(done){
                 importUsersData(function(){
                    importPostsData(function(){
                         addCommentToPost(TEST_POST_PERMALINK, 
@@ -292,7 +297,7 @@ describe("/post/new page tests", function(){
                                     function(err, res){
                                         var $ = cheerio.load(res.text),
                                             dataToken = $('.like').attr('data-token');
-                                        dataToken.length.should.be.above(36);
+                                        Utils.fromBase64(dataToken).should.be.match(/^[0-9]{13}-[0-9]{1,}$/i);
                                         done();
                                     }
                         );
@@ -322,10 +327,10 @@ describe("/post/new page tests", function(){
                     importUsersData(function(){
                        importPostsData(function(){
                             var commentOrdinal = '0',
-                                guid = Utils.genGuid();
+                                token = Utils.toBase64(Utils.format("{0}-{1}", new Date().getTime().toString(), commentOrdinal));
                                 
                             addLikeToPostComment(TEST_POST_PERMALINK_WITH_COMMENTS,
-                                                 guid + commentOrdinal,
+                                                 token,
                                                  function(err, res){
                                                     should.not.exists(err);
                                                     res.status.should.be.equal(200);
@@ -339,10 +344,10 @@ describe("/post/new page tests", function(){
                     importUsersData(function(){
                        importPostsData(function(){
                             var commentOrdinal = '0',
-                                guid = Utils.genGuid();
+                                token = Utils.toBase64(Utils.format("{0}-{1}", new Date().getTime().toString(), commentOrdinal));
                                 
                             addLikeToPostComment(TEST_POST_PERMALINK_WITH_COMMENTS,
-                                                 guid + commentOrdinal,
+                                                 token,
                                                  function(err, res){
                                                     should.not.exists(err);
                                                     res.body.hasOwnProperty('success').should.be.ok;
@@ -357,10 +362,10 @@ describe("/post/new page tests", function(){
                     importUsersData(function(){
                        importPostsData(function(){
                             var commentOrdinal = '0',
-                                guid = Utils.genGuid();                            
+                                token = Utils.toBase64(Utils.format("{0}-{1}", new Date().getTime().toString(), commentOrdinal));                         
                                 
                             addLikeToPostComment(TEST_POST_PERMALINK_WITH_COMMENTS,
-                                                guid + commentOrdinal,
+                                                 token,
                                                  function(err, res){
                                                     should.not.exists(err);
                                                     res.body.success.should.be.ok;
@@ -448,9 +453,9 @@ describe("/post/new page tests", function(){
                     importUsersData(function(){
                         importPostsData(function(){
                             addCommentToPost(TEST_POST_PERMALINK, 
-                                'anonUser',
-                                'anon@email.com',
-                                'Very nice lorem ipsum post!',
+                                AnonymousUser.author,
+                                AnonymousUser.email,
+                                AnonymousUser.body,
                                 function(err, res){
                                     should.not.exist(err);
                                     res.status.should.be.equal(200);
@@ -465,9 +470,9 @@ describe("/post/new page tests", function(){
                     importUsersData(function(){
                         importPostsData(function(){
                             addCommentToPost(TEST_POST_PERMALINK, 
-                                'anonUser',
-                                'anon@email.com',
-                                'Very nice lorem ipsum post!',
+                                AnonymousUser.author,
+                                AnonymousUser.email,
+                                AnonymousUser.body,
                                 function(err, res){
                                     should.not.exist(err);
                                     var $ = cheerio.load(res.text);
@@ -483,9 +488,9 @@ describe("/post/new page tests", function(){
                     importUsersData(function(){
                         importPostsData(function(){
                             addCommentToPost(TEST_POST_PERMALINK, 
-                                'anonUser',
-                                'anon@email.com',
-                                'Very nice lorem ipsum post!',
+                                AnonymousUser.author,
+                                AnonymousUser.email,
+                                AnonymousUser.body,
                                 function(err, res){
                                     should.not.exist(err);
                                     res.redirects.should.include(httpRootPath+'/post/'+TEST_POST_PERMALINK+ '/view');
