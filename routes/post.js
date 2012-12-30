@@ -1,5 +1,6 @@
 var services = require('../lib/data/services').services,
     querystring = require('querystring'),
+    marked = require("marked"),
     Utils = require('../lib/utils/utils').Utils;
     EMPTY_ERRORS = {"comment-author-error" : "", 
                    "comment-email-error" : "",
@@ -35,10 +36,22 @@ function renderViewPostPage(req, res, post, formCommentv){
     res.render('viewpost', { title : "View post page", post : postEntity, isAuthenticated : isAuthenticated(req, res), comment : formComment });
 }
 
+function MDtoHTML(mdBody){
+
+    marked.setOptions({
+      gfm: true,
+      pedantic: false,
+      sanitize: true,
+    });
+    
+    return Utils.replaceCrLf(marked(mdBody), '<br>');
+}
+
 function renderPostViewWithCommentForm(req, res, comment){
      services.getPostsService(function(err, ps){
         ps.getByPermalink(req.params['permalink'], 
             function(err, post){
+                post.body = MDtoHTML(post.body);
                 renderViewPostPage(req, res, post, comment);
             }
         );

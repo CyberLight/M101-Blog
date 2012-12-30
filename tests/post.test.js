@@ -6,7 +6,8 @@ var mocha = require('../node_modules/mocha'),
     MdbUnit = require("../lib/utils/database/mdb.unit").MdbUnit,
     Utils = require("../lib/utils/utils").Utils,
     mDbImport = new MdbUnit.Import(),
-	cheerio = require('../node_modules/cheerio'),	
+	cheerio = require('../node_modules/cheerio'),
+    fs = require('fs'),
 	agent = superagent.agent(),
 	httpRootPath = 'http://localhost:3000',
     DB_NAME = "M101Test",
@@ -20,6 +21,8 @@ will be distracted by the readable content of a page when looking at its layout.
  Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many \
  web sites still in their infancy. Various versions have evolved over the years, \
  sometimes by accident, sometimes on purpose (injected humour and the like).",
+    TEST_MD_POST_BODY = "",
+    TEST_HTML_REPR_POST_BODY = "",
     TestUser = {
          username : 'user1',
          password : 'password1'
@@ -27,6 +30,11 @@ will be distracted by the readable content of a page when looking at its layout.
     TestPost1 = {
         title : 'My today post title #1',
         body : 'My today post #1:' + TEST_POST_BODY,
+        tags : 'sun, smile, light'
+    },
+    TestPostMd1 = {
+        title : 'My today post title #1',
+        body : '',
         tags : 'sun, smile, light'
     },
     TEST_POST_PERMALINK = '140f01bfd2f126e4d99128a6cf8e5d17',
@@ -149,6 +157,19 @@ function addCommentToPostForLoggedInUser(permalink, bodyv, cb){
                      .end(cb);
 }
 
+before(function(){
+    fs.readFile('./tests/content/md-test-body-post1.txt', function (err, data) {
+        if (err) throw err;
+        TEST_MD_POST_BODY = data.toString();        
+        TestPostMd1.body = TEST_MD_POST_BODY;
+    });
+    
+    fs.readFile('./tests/content/md-test-body-post1.html', function (err, data) {
+        if (err) throw err;
+        TEST_HTML_REPR_POST_BODY = data.toString();
+    });
+});
+
 describe("/post/new page tests", function(){
     
     describe("GET /post/new", function(){
@@ -260,6 +281,36 @@ describe("/post/new page tests", function(){
                             );
                         });
                    });
+                });
+            });
+            
+            it("should contains html data for new blog post entry which sended in \"markdown\" format", function(done){
+                importUsersData(function(){
+                   importPostsData(function(){
+                       login(
+                         TestUser.username,
+                         TestUser.password,
+                         function(err, res){
+                            should.not.exist(err);
+                            postEntryData(
+
+                                TestPostMd1.title,
+                                TestPostMd1.body,
+                                TestPostMd1.tags,
+                                
+                                function(err, res){
+                                        should.not.exist(err);
+                                        var $ = cheerio.load(res.text),                                            
+                                            SELECTOR_BODY = '.post-body-view';
+                                            
+                                        $('.post-title-view').text().should.be.equal(TestPost1.title.toUpperCase());
+										$(SELECTOR_BODY).html().should.be.equal(Utils.replaceCrLf(TEST_HTML_REPR_POST_BODY, '<br>'));
+                                        $('.post-tags-view').text().should.be.equal(TestPost1.tags);
+                                        done();
+                                }
+                            );
+                         });
+                    });
                 });
             });
         });

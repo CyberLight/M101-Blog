@@ -16,7 +16,8 @@
     "jade": "*",
     "less-middleware": "*",
     "mongodb" : "latest",
-    "secure_random" : "*"
+    "secure_random" : "*",
+    "marked" : "*"
   },
   "publicConfig": {
     "http_port": 3000,
