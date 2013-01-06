@@ -44,7 +44,7 @@ function MDtoHTML(mdBody){
       sanitize: true,
     });
     
-    return Utils.replaceCrLf(marked(mdBody), '<br>');
+    return marked(mdBody);
 }
 
 function renderPostViewWithCommentForm(req, res, comment){

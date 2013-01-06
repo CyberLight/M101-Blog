@@ -7,6 +7,7 @@ var mocha = require('../node_modules/mocha'),
     Utils = require("../lib/utils/utils").Utils,
     mDbImport = new MdbUnit.Import(),
 	cheerio = require('../node_modules/cheerio'),
+	marked = require('marked'),
     fs = require('fs'),
 	agent = superagent.agent(),
 	httpRootPath = 'http://localhost:3000',
@@ -304,7 +305,7 @@ describe("/post/new page tests", function(){
                                             SELECTOR_BODY = '.post-body-view';
                                             
                                         $('.post-title-view').text().should.be.equal(TestPost1.title.toUpperCase());
-										$(SELECTOR_BODY).html().should.be.equal(Utils.replaceCrLf(TEST_HTML_REPR_POST_BODY, '<br>'));
+										$(SELECTOR_BODY).html().should.be.equal(marked(TEST_MD_POST_BODY));
                                         $('.post-tags-view').text().should.be.equal(TestPost1.tags);
                                         done();
                                 }
